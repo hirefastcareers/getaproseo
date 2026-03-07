@@ -2,18 +2,58 @@ const Anthropic = require("@anthropic-ai/sdk");
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// In-memory IP rate limit for teaser: { count, firstRequestAt }
+const TEASER_RATE_LIMIT = new Map();
+const TEASER_MAX_PER_IP = 2;
+const TEASER_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function getClientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (forwarded) {
+    const first = typeof forwarded === "string" ? forwarded.split(",")[0] : forwarded[0];
+    return (first || "").trim();
+  }
+  return req.socket?.remoteAddress || "";
+}
+
+function checkTeaserRateLimit(ip) {
+  if (!ip) return { allowed: true };
+  const now = Date.now();
+  let record = TEASER_RATE_LIMIT.get(ip);
+  if (!record) {
+    TEASER_RATE_LIMIT.set(ip, { count: 1, firstRequestAt: now });
+    return { allowed: true };
+  }
+  if (now - record.firstRequestAt > TEASER_WINDOW_MS) {
+    record = { count: 1, firstRequestAt: now };
+    TEASER_RATE_LIMIT.set(ip, record);
+    return { allowed: true };
+  }
+  if (record.count >= TEASER_MAX_PER_IP) {
+    return { allowed: false };
+  }
+  record.count += 1;
+  return { allowed: true };
+}
+
 const TEASER_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL small business owners. 
 Write in plain English — no jargon. Imagine you're explaining to a local tradesperson or shop owner who has never done SEO before.
 Avoid terms like "canonical tags", "crawlability", "SERP" without explaining them simply.
-Be specific, friendly, and actionable.
+
+This is a FREE PREVIEW. Your job is to make it genuinely useful and credible, but NOT fully actionable without the paid report.
 
 Generate ONLY these 2 sections as a teaser:
 
 ## SEO Snapshot
 ## Keyword Strategy
 
+For each section:
+- Identify what the problems and opportunities ARE in plain English — name them clearly so the reader feels understood.
+- Do NOT give specific fixes, formulas, code, or step-by-step instructions. Tease the value; don't deliver the full solution.
+- End each section with a natural hook such as: "The full report shows you exactly how to fix this" (or similar).
+
 Use ## for section headings, ### for sub-headings, - for bullet points, **bold** for emphasis.
-Keep each section meaty and genuinely useful — this is what sells the full report.`;
+Keep each section meaty and credible — this is what sells the full report.`;
 
 const FULL_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL small business owners.
 Write in plain, friendly English — imagine explaining to a local tradesperson or shop owner.
@@ -78,6 +118,17 @@ module.exports = async (req, res) => {
   if (!url) return res.status(400).json({ error: "URL is required" });
 
   const isTeaser = type === "teaser";
+  if (isTeaser) {
+    const clientIp = getClientIp(req);
+    const { allowed } = checkTeaserRateLimit(clientIp);
+    if (!allowed) {
+      return res.status(429).json({
+        error: "You've used your free previews. Please unlock the full report to continue.",
+        limitReached: true,
+      });
+    }
+  }
+
   const system = isTeaser ? TEASER_SYSTEM : FULL_SYSTEM;
 
   const userMessage = `Please generate an SEO report for this website:
