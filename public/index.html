@@ -669,13 +669,58 @@ footer a { color: #aaa; text-decoration: none; }
   .price-options { grid-template-columns: 1fr; }
   .unlock-card { padding: 28px 20px; }
 }
+
+@media (max-width: 768px) {
+  /* Nav — hide the badge on mobile, keep it clean */
+  nav .ai-badge { display: none; }
+
+  /* Hero — tighter padding */
+  .hero { padding: 32px 16px 24px; }
+
+  /* Hero title — smaller on mobile */
+  .hero h1 { font-size: 36px; margin-bottom: 14px; }
+
+  /* Hero subheading — smaller */
+  .hero-sub { font-size: 15px; margin-bottom: 20px; }
+
+  /* Stats row — put all 3 in a single row, smaller text */
+  .stats-row {
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stats-row > div {
+    min-width: 80px;
+  }
+  .stats-number { font-size: 28px !important; }
+  .stats-label { font-size: 11px !important; }
+
+  /* Tool card — tighter */
+  .tool-card { padding: 20px 16px; border-radius: 14px; }
+
+  /* Features section — single column, less padding */
+  .features { padding: 48px 16px; margin-top: 40px; }
+  .features-title { font-size: 26px; }
+  .features-sub { font-size: 14px; margin-bottom: 28px; }
+  .features-grid { grid-template-columns: 1fr; gap: 12px; }
+  .feature-card { padding: 18px; }
+
+  /* Pricing — single column, less padding */
+  .pricing { padding: 48px 16px; }
+  .pricing-cards { grid-template-columns: 1fr; }
+  .pricing-card { padding: 24px 18px; }
+  .pricing-card-price { font-size: 36px; }
+
+  /* Unlock card — tighter */
+  .unlock-card { padding: 24px 16px; margin: 40px 8px 0; }
+  .unlock-card h2 { font-size: 22px; }
+}
 </style>
 </head>
 <body>
 
 <nav>
   <a href="/"><img src="/logo-full.png" alt="GetAProSEO" style="height:44px;width:auto;display:block;"></a>
-  <span style="font-size:12px;color:#0d9488;font-weight:600;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:5px 12px;">✦ Now includes AI Search Visibility</span>
+  <span class="ai-badge" style="font-size:12px;color:#0d9488;font-weight:600;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:5px 12px;">✦ Now includes AI Search Visibility</span>
   <a class="nav-cta" href="#tool">Get My SEO Report</a>
 </nav>
 
@@ -683,18 +728,18 @@ footer a { color: #aaa; text-decoration: none; }
 <section class="hero" id="tool">
   <h1 class="animate-fade-up" data-animate-on="load" data-animate-delay="50">Find out exactly why your website<br>isn't ranking on <em>Google</em></h1>
   <p class="hero-sub animate-fade-up" data-animate-on="load" data-animate-delay="100">Your plain-English SEO report. No jargon. No agency. Results in 60 seconds.</p>
-<div style="display:flex;justify-content:center;gap:48px;margin-bottom:40px;flex-wrap:wrap;">
+<div class="stats-row" style="display:flex;justify-content:center;gap:48px;margin-bottom:40px;flex-wrap:wrap;">
   <div style="text-align:center;">
-    <div style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">60s</div>
-    <div style="font-size:13px;color:#888;margin-top:4px;">Results in 60 seconds</div>
+    <div class="stats-number" style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">60s</div>
+    <div class="stats-label" style="font-size:13px;color:#888;margin-top:4px;">Results in 60 seconds</div>
   </div>
   <div style="text-align:center;">
-    <div style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">12</div>
-    <div style="font-size:13px;color:#888;margin-top:4px;">Report sections</div>
+    <div class="stats-number" style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">12</div>
+    <div class="stats-label" style="font-size:13px;color:#888;margin-top:4px;">Report sections</div>
   </div>
   <div style="text-align:center;">
-    <div style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">£7.99</div>
-    <div style="font-size:13px;color:#888;margin-top:4px;">One-off report</div>
+    <div class="stats-number" style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">£7.99</div>
+    <div class="stats-label" style="font-size:13px;color:#888;margin-top:4px;">One-off report</div>
   </div>
 </div>
 
