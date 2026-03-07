@@ -1,0 +1,12 @@
+{
+  "name": "getaproseo",
+  "version": "1.0.0",
+  "description": "Professional SEO reports for small business owners",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "stripe": "^14.0.0"
+  }
+}
