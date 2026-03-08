@@ -1,3 +1,8 @@
+const { createClient } = require('@supabase/supabase-js');
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_KEY
+);
 const Anthropic = require("@anthropic-ai/sdk");
 const client = new Anthropic();
 
@@ -136,6 +141,30 @@ module.exports = async (req, res) => {
   }
 
   const isTeaser = type === 'teaser';
+
+  // Check for existing saved report
+  if (!isTeaser && req.body.session_id) {
+    try {
+      const { data } = await supabase
+        .from('reports')
+        .select('report_text')
+        .eq('session_id', req.body.session_id)
+        .single();
+
+      if (data?.report_text) {
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.write(`data: ${JSON.stringify({ text: data.report_text })}\n\n`);
+        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+        res.end();
+        return;
+      }
+    } catch (e) {
+      console.error('Supabase fetch error:', e);
+    }
+  }
+
   const siteContent = await fetchWebsiteContent(url);
   const websiteData = siteContent.success ? `
 ACTUAL WEBSITE DATA (fetched directly — use as primary source of truth):
@@ -178,6 +207,19 @@ ACTUAL WEBSITE DATA (fetched directly — use as primary source of truth):
 
       res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
       res.end();
+
+      // Save report to Supabase
+      try {
+        await supabase.from('reports').upsert({
+          session_id: req.body.session_id || '',
+          url: url,
+          context: context || '',
+          email: email || '',
+          report_text: fullText
+        }, { onConflict: 'session_id' });
+      } catch (e) {
+        console.error('Supabase save error:', e);
+      }
 
       // Send email with report attached after streaming completes
       if (email) {
