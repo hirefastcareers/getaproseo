@@ -1071,11 +1071,25 @@ async function generateTeaser() {
   startLoadingMessages();
 
   try {
-    const res = await fetch('/api/report', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: cleanUrl, context, type: 'teaser' })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
+
+    let res;
+    try {
+      res = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: cleanUrl, context, type: 'teaser' }),
+        signal: controller.signal
+      });
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        throw new Error('Preview timed out. Please try again.');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to generate report');
@@ -1287,11 +1301,25 @@ window.addEventListener('load', async () => {
       }
 
       // Generate full report
-      const reportRes = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: returnUrl, context: returnContext || '', type: 'full' })
-      });
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000);
+
+      let reportRes;
+      try {
+        reportRes = await fetch('/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: returnUrl, context: returnContext || '', type: 'full' }),
+          signal: controller.signal
+        });
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          throw new Error('Report generation timed out. Please try again or contact hello@getaproseo.com for a full refund.');
+        }
+        throw err;
+      } finally {
+        clearTimeout(timeout);
+      }
 
       const reportData = await reportRes.json();
       if (!reportRes.ok) throw new Error(reportData.error || 'Failed to generate report');
