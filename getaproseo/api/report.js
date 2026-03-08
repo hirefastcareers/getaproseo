@@ -172,9 +172,6 @@ ACTUAL WEBSITE DATA (fetched directly — use as primary source of truth):
         }
       }
 
-      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-      res.end();
-
       // Save report to Supabase
       try {
         await supabase.from('reports').upsert({
@@ -188,10 +185,13 @@ ACTUAL WEBSITE DATA (fetched directly — use as primary source of truth):
         console.error('Supabase save error:', e);
       }
 
-      // Send email with report attached after streaming completes
+      // Send email before ending response
       if (email) {
         await generatePDFAndEmail(fullText, url, email, req.body.session_id || '');
       }
+
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
 
     } catch (err) {
       res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
