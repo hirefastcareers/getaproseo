@@ -787,11 +787,15 @@ footer a { color: #aaa; text-decoration: none; }
       </div>
     </div>
 
-    <div id="loading">
-      <div class="spinner"></div>
-      <div class="loading-text" id="loadingText">Analysing your website...</div>
-      <div class="loading-sub">Building your personalised SEO preview</div>
-    </div>
+    <div id="loading" style="display:none;text-align:center;padding:40px 0;">
+  <div style="font-size:32px;margin-bottom:16px;">🔍</div>
+  <div class="loading-text" id="loadingText" style="font-size:16px;font-weight:600;color:#0a0a0a;margin-bottom:8px;">Analysing your website...</div>
+  <div class="loading-sub" style="font-size:13px;color:#aaa;margin-bottom:24px;">This takes around 30–60 seconds — please don't close this tab</div>
+  <div style="background:#f1f3f5;border-radius:999px;height:8px;width:100%;overflow:hidden;">
+    <div id="progressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#0d9488,#2563eb);border-radius:999px;transition:width 0.8s ease;"></div>
+  </div>
+  <div id="progressLabel" style="font-size:12px;color:#aaa;margin-top:8px;">0%</div>
+</div>
 
     <div class="error-box" id="errorBox"></div>
 
@@ -1010,17 +1014,42 @@ const loadingMessages = [
 ];
 
 let loadingInterval;
+let progressInterval;
 
 function startLoadingMessages() {
+  const messages = [
+    'Fetching your website content...',
+    'Analysing your keywords...',
+    'Checking your Google visibility...',
+    'Researching your competitors...',
+    'Building your 90-day action plan...',
+    'Almost there — finalising your report...',
+  ];
   let i = 0;
+  let progress = 0;
+  
   loadingInterval = setInterval(() => {
-    i = (i + 1) % loadingMessages.length;
-    document.getElementById('loadingText').textContent = loadingMessages[i];
-  }, 2500);
+    i = Math.min(i + 1, messages.length - 1);
+    document.getElementById('loadingText').textContent = messages[i];
+  }, 8000);
+
+  progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += Math.random() * 3;
+      progress = Math.min(progress, 90);
+      document.getElementById('progressBar').style.width = progress + '%';
+      document.getElementById('progressLabel').textContent = Math.round(progress) + '%';
+    }
+  }, 1500);
 }
 
 function stopLoadingMessages() {
   clearInterval(loadingInterval);
+  clearInterval(progressInterval);
+  const bar = document.getElementById('progressBar');
+  const label = document.getElementById('progressLabel');
+  if (bar) { bar.style.width = '100%'; }
+  if (label) { label.textContent = '100%'; }
 }
 
 async function generateTeaser() {
