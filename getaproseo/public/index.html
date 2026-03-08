@@ -1224,6 +1224,17 @@ window.addEventListener('load', async () => {
   const returnContext = params.get('context');
 
   if (sessionId && returnUrl) {
+    // Hide homepage sections for clean report view
+    document.querySelector('.hero').style.display = 'none';
+    document.querySelector('.features').style.display = 'none';
+    document.querySelector('.pricing').style.display = 'none';
+    document.querySelector('footer').style.display = 'none';
+
+    // Update nav button based on plan
+    const navCta = document.querySelector('.nav-cta');
+    navCta.textContent = 'New Report';
+    navCta.onclick = (e) => { e.preventDefault(); resetTool(); };
+
     // Verify payment and generate full report
     document.getElementById('input-section').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
@@ -1261,6 +1272,24 @@ window.addEventListener('load', async () => {
       document.getElementById('reportUrlDisplay').textContent = returnUrl;
       document.getElementById('full-report-content').innerHTML = renderMarkdown(reportData.report);
       document.getElementById('full-report').style.display = 'block';
+
+      // Update nav based on plan type
+      const navCta = document.querySelector('.nav-cta');
+      if (verifyData.plan === 'subscription') {
+        navCta.textContent = 'New Report';
+        navCta.style.background = '#0d9488';
+        navCta.onclick = (e) => { e.preventDefault(); resetTool(); };
+      } else {
+        navCta.textContent = 'Get Unlimited Reports — £19.99/mo';
+        navCta.style.background = '#0d9488';
+        navCta.style.fontSize = '13px';
+        navCta.href = '#';
+        navCta.onclick = (e) => {
+          e.preventDefault();
+          selectPlan('subscription');
+          checkout();
+        };
+      }
 
       // Clean URL
       window.history.replaceState({}, '', '/');

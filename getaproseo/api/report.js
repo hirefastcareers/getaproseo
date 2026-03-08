@@ -104,7 +104,9 @@ Week 9-12: Long term growth
 
 Format as a clear prioritised checklist. Be realistic — this is a small business owner, not a full time marketer.
 
-Use ## for sections, ### for sub-headings, - for bullets, **bold** for key points, and include code blocks for any technical snippets.`;
+Use ## for sections, ### for sub-headings, - for bullets, **bold** for key points, and include code blocks for any technical snippets.
+
+Never include raw HTML tags, XML, or code snippets in your response unless they are inside a markdown code block (\`\`\`). Do not output heading structure examples as raw HTML. Do not output sitemap XML as raw text.`;
 
 async function fetchWebsiteContent(url) {
   return new Promise((resolve) => {
