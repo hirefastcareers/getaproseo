@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/logo-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample SEO Report — Sheffield Plumbing Co | GetAProSEO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0a0a0a;
+  --dark: #1a1a2e;
+  --white: #ffffff;
+  --off-white: #f8f9fa;
+  --light-grey: #f1f3f5;
+  --mid-grey: #868e96;
+  --border: #e9ecef;
+  --accent: #0d9488;
+  --accent-dark: #0f766e;
+  --accent-light: #f0fdfa;
+  --green: #16a34a;
+  --green-light: #f0fdf4;
+  --red: #dc2626;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.1);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+  color: var(--black);
+  line-height: 1.6;
+}
+
+nav {
+  position: sticky;
+  top: 0;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--black);
+  text-decoration: none;
+}
+
+.nav-logo span { color: var(--accent); }
+
+.nav-cta {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.nav-cta:hover { background: var(--accent-dark); }
+
+.sample-banner {
+  background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+  border: 1px solid #99f6e4;
+  border-radius: 12px;
+  padding: 16px 24px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--accent-dark);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.report-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+.report-url-bar {
+  background: var(--off-white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report-url-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--mid-grey); font-weight: 600; }
+.report-url-value { font-size: 14px; color: var(--accent); font-weight: 500; }
+
+.report-section {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--black);
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--accent-light);
+}
+
+.report-body { font-size: 14px; line-height: 1.75; color: #374151; }
+.report-body h3 { font-size: 15px; font-weight: 700; color: var(--black); margin: 18px 0 8px; }
+.report-body p { margin-bottom: 10px; }
+.report-body ul, .report-body ol { padding-left: 20px; margin-bottom: 12px; }
+.report-body li { margin-bottom: 6px; }
+.report-body strong { color: var(--black); font-weight: 600; }
+.report-body code {
+  background: var(--light-grey);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+.report-body pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 14px 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.cta-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px;
+  text-align: center;
+  margin-top: 40px;
+  box-shadow: var(--shadow-lg);
+}
+
+.cta-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.cta-card p {
+  color: var(--mid-grey);
+  font-size: 14px;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.btn-cta {
+  display: inline-block;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-cta:hover {
+  background: var(--accent-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(13,148,136,0.28);
+}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="/">GetAPro<span>SEO</span></a>
+  <a class="nav-cta" href="/#tool">Get My SEO Report</a>
+</nav>
+
+<div class="report-container">
+  <div class="sample-banner">
+    📄 This is a sample report for a fictional plumbing business — your report will be tailored specifically to your website
+  </div>
+
+  <div class="report-url-bar">
+    <span class="report-url-label">Report for</span>
+    <span class="report-url-value">emergencyplumbersheffieldco.uk</span>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">SEO Snapshot</div>
+    <div class="report-body">
+      <p><strong>Sheffield Plumbing Co</strong> has a solid local presence but is missing several opportunities that could put you on the first page of Google for "emergency plumber Sheffield" and related searches. Right now, Google likely sees your site as a typical local tradesperson site — functional but not optimised to stand out.</p>
+      <h3>Top 3 opportunities</h3>
+      <ul>
+        <li><strong>Title tags and meta descriptions</strong> — Your homepage and service pages don't clearly target the phrases people actually search for when they need an emergency plumber in Sheffield.</li>
+        <li><strong>Google Business Profile</strong> — Your listing could be doing much more with photos, posts, and Q&amp;A to capture "near me" and voice search traffic.</li>
+        <li><strong>Local content</strong> — You're not yet answering the questions Sheffield residents type into Google (e.g. "burst pipe what to do", "boiler not working Sheffield").</li>
+      </ul>
+      <p>The good news: these are all fixable. A few focused changes could significantly improve where you appear in search results.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Keyword Strategy</div>
+    <div class="report-body">
+      <p><strong>Search intent</strong> simply means what someone is trying to do when they type a query. For emergency plumbers, most people want to find a local number fast — so your goal is to show up when they search.</p>
+      <h3>Primary keywords to target</h3>
+      <ul>
+        <li>Emergency plumber Sheffield</li>
+        <li>24 hour plumber Sheffield</li>
+        <li>Plumber Sheffield</li>
+      </ul>
+      <h3>Long-tail opportunities</h3>
+      <p>These longer phrases have less competition and often convert better: "emergency plumber Sheffield weekend", "boiler repair Sheffield same day", "blocked drain Sheffield emergency".</p>
+      <h3>Local keywords</h3>
+      <p>Include area names in your content: Ecclesall, Broomhill, Hillsborough, city centre, S1, S10, etc. This helps you rank for "plumber near me" when someone is in those areas.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">On-Page SEO</div>
+    <div class="report-body">
+      <p><strong>Your title tags are one of the most important ranking factors.</strong> Think of them like the headline of a newspaper — they need to be compelling and contain your main keyword.</p>
+      <h3>Homepage title tag formula</h3>
+      <p>Primary Keyword | Secondary Keyword | Your Business Name</p>
+      <p>Example for Sheffield Plumbing Co: <strong>Emergency Plumber Sheffield | 24/7 Boiler &amp; Drain Repairs | Sheffield Plumbing Co</strong></p>
+      <h3>Meta description</h3>
+      <p>Keep it under 155 characters. Include your main keyword and a clear call to action. Example: "Need an emergency plumber in Sheffield? We're available 24/7 for burst pipes, boiler breakdowns &amp; blocked drains. Call now for fast response."</p>
+      <h3>Heading structure</h3>
+      <p>Use one H1 per page (your main topic). Use H2s for main sections and H3s for sub-points. This helps Google and visitors understand your content.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Technical SEO</div>
+    <div class="report-body">
+      <p>Technical SEO is about making sure Google can find, load, and understand your site easily. You don't need to be a developer — just tick a few boxes.</p>
+      <h3>Core Web Vitals</h3>
+      <p>These measure how fast and stable your site feels. Slow or jumpy pages get pushed down by Google. Use Google's PageSpeed Insights to check; aim for green scores on mobile.</p>
+      <h3>Mobile checklist</h3>
+      <ul>
+        <li>Text readable without zooming</li>
+        <li>Buttons and links easy to tap (not too close together)</li>
+        <li>No horizontal scrolling</li>
+        <li>Click-to-call phone number prominent</li>
+      </ul>
+      <h3>Sitemap</h3>
+      <p>A sitemap is a list of your pages you give to Google so it knows what to crawl. If you use WordPress or a similar platform, there's usually a plugin; otherwise your web designer can add one. Submit it in Google Search Console.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Content Strategy</div>
+    <div class="report-body">
+      <p>Creating useful content helps you rank for more search terms and builds trust. Here are <strong>10 page or blog ideas</strong> that fit a Sheffield emergency plumber:</p>
+      <ol>
+        <li><strong>What to do when you have a burst pipe</strong> — Step-by-step guide; targets "burst pipe emergency" type searches.</li>
+        <li><strong>Boiler not working? Checklist before you call a plumber</strong> — Helps with "boiler not working Sheffield" and positions you as the expert.</li>
+        <li><strong>How to prevent frozen pipes in Sheffield</strong> — Seasonal, local, and highly relevant.</li>
+        <li><strong>Emergency plumber costs: what to expect in Sheffield</strong> — Addresses a common question and can capture "emergency plumber cost" searches.</li>
+        <li><strong>Blocked drain vs blocked toilet: when to call an emergency plumber</strong> — Educational and keyword-rich.</li>
+        <li><strong>Landlord gas safety: what you need to know (Sheffield)</strong> — Targets landlords and gas safety certificate searches.</li>
+        <li><strong>Bathroom leak: DIY fixes vs when to call a plumber</strong> — Balances helpful content with a clear CTA.</li>
+        <li><strong>Best areas we cover in Sheffield</strong> — Reinforces local SEO and area-based keywords.</li>
+        <li><strong>Why choose a local plumber over a national company</strong> — Builds trust and differentiates you.</li>
+        <li><strong>FAQ: Emergency plumbing in Sheffield</strong> — Answer common questions in one place; great for featured snippets.</li>
+      </ol>
+      <p>Tip: publish one piece every 2–4 weeks and link back to your contact page. Add a simple FAQ page with questions like "Do you cover S10?", "Are you available on bank holidays?"</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Local SEO &amp; Google Business Profile</div>
+    <div class="report-body">
+      <p><strong>Google Business Profile</strong> (formerly Google My Business) is the panel that appears when people search "plumber Sheffield" or "emergency plumber near me". It shows your name, address, phone, hours, photos, and reviews. Optimising it is essential for local trades.</p>
+      <h3>Step-by-step optimisation</h3>
+      <ul>
+        <li>Claim and verify your listing if you haven't already.</li>
+        <li>Use a precise, consistent business name (e.g. "Sheffield Plumbing Co").</li>
+        <li>Choose the right categories: "Plumber", "Emergency plumbing service".</li>
+        <li>Add a clear, keyword-rich business description (250–750 characters).</li>
+        <li>Upload photos regularly: vans, team, completed jobs (with permission), tools.</li>
+        <li>Set your service area (e.g. Sheffield and surrounding areas).</li>
+        <li>Enable messaging if you can respond quickly.</li>
+      </ul>
+      <h3>Review strategy</h3>
+      <p>Ask happy customers to leave a Google review. Send a short link after the job. Respond to every review — thank positive ones and address any negatives professionally. More genuine reviews improve visibility and trust.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">AI Search Visibility ✨</div>
+    <div class="report-body">
+      <p><strong>This is the biggest new opportunity in SEO.</strong> When someone asks ChatGPT, Google AI, or Perplexity "who is the best emergency plumber in Sheffield?", the AI often gives a direct answer — with or without a link to your site. Getting mentioned in those answers can drive serious leads.</p>
+      <h3>How to improve your chances</h3>
+      <ul>
+        <li><strong>Clear, factual content</strong> — AIs prefer well-structured pages that state who you are, what you do, and where you operate. Have a clear "About" and "Services" section.</li>
+        <li><strong>Schema markup</strong> — Tell search engines you're a local plumber with opening hours and area served (see Schema section below).</li>
+        <li><strong>Authoritative mentions</strong> — Being listed on trusted directories (Checkatrade, Which?, local business listings) helps AIs cite you.</li>
+        <li><strong>FAQ and Q&amp;A content</strong> — Pages that answer "Do you offer 24/7 emergency plumbing in Sheffield?" in plain language are more likely to be used as a source.</li>
+      </ul>
+      <p>Focus on being the obvious, well-described choice when an AI is summarising "best emergency plumbers in Sheffield".</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Competitor Analysis</div>
+    <div class="report-body">
+      <p>Based on your niche and location, your main Google competitors are likely other established Sheffield plumbers and small regional firms. Here's what they're probably doing better — and how you can close the gap.</p>
+      <h3>Competitor 1: Established Sheffield plumbing company</h3>
+      <p>Likely strengths: lots of reviews, strong GBP, blog content targeting "plumber Sheffield" and area names. <strong>Gap to exploit:</strong> Focus on "emergency" and "24/7" more clearly; many competitors underplay speed of response.</p>
+      <h3>Competitor 2: National franchise with local landing page</h3>
+      <p>Likely strengths: big brand, technical SEO. <strong>Gap to exploit:</strong> They're not truly local. Emphasise "Sheffield-based", "local team", "we know the area" — and outdo them on local content and reviews.</p>
+      <h3>Competitor 3: Smaller local plumber with great reviews</h3>
+      <p>Likely strengths: high review count and rating. <strong>Gap to exploit:</strong> They may have weak content or technical SEO. Improve your content and on-page SEO so you rank for more long-tail terms while you build reviews.</p>
+      <p>Action: Search "emergency plumber Sheffield" and note the top 3 results. Look at their titles, descriptions, and content — then make yours clearer and more relevant.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Schema Markup (Rich Results)</div>
+    <div class="report-body">
+      <p><strong>Schema markup</strong> is code you add to your site that tells Google (and other search engines) exactly what your business is — like giving them a structured business card. It can help you show up with extra details in search results (e.g. star ratings, opening hours) and improves how AIs understand you.</p>
+      <p>Below is <strong>JSON-LD</strong> code for a local plumbing business. Ask your web developer to add this to your homepage (in the &lt;head&gt; or before &lt;/body&gt;), and update the placeholder values to match Sheffield Plumbing Co.</p>
+      <pre>{
+  "@context": "https://schema.org",
+  "@type": "Plumber",
+  "name": "Sheffield Plumbing Co",
+  "url": "https://emergencyplumbersheffieldco.uk",
+  "telephone": "+44-XXX-XXX-XXXX",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Sheffield",
+    "addressRegion": "South Yorkshire",
+    "addressCountry": "GB"
+  },
+  "areaServed": ["Sheffield", "South Yorkshire"],
+  "priceRange": "££",
+  "openingHoursSpecification": {
+    "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+    "opens": "00:00",
+    "closes": "23:59"
+  },
+  "description": "Emergency plumber Sheffield. 24/7 boiler repairs, blocked drains, burst pipes. Local, trusted, fast response."
+}</pre>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Backlink Building</div>
+    <div class="report-body">
+      <p><strong>Backlinks</strong> are links from other websites to yours. Google treats them like votes of confidence — quality links from relevant sites can help you rank higher. For a local plumber, you don't need thousands; you need a handful of good ones.</p>
+      <h3>Realistic tactics for Sheffield Plumbing Co</h3>
+      <ul>
+        <li><strong>Local directories</strong> — Get listed on Sheffield-based and UK trade directories (Checkatrade, Trustpilot, Yell, Bing Places). Use consistent NAP (name, address, phone).</li>
+        <li><strong>Trade associations</strong> — If you're registered with CIPHE, Gas Safe, or similar, ensure they link to your site.</li>
+        <li><strong>Local news and blogs</strong> — Offer a quote or tip for a "winter plumbing advice" or "local business spotlight" piece. One link from a local site can be very valuable.</li>
+        <li><strong>Supplier or partner sites</strong> — If you're an approved installer for a boiler brand, ask if they list installers with a link.</li>
+        <li><strong>Charity or community</strong> — Sponsoring a local event or offering a free talk can lead to a mention and link from the organiser's site.</li>
+      </ul>
+      <p>Avoid buying links or link farms — Google can penalise that. Focus on being genuinely useful and easy to cite.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Google Search Console Setup</div>
+    <div class="report-body">
+      <p><strong>Google Search Console</strong> is a free tool that shows how Google sees your site: which queries bring impressions and clicks, which pages are indexed, and if there are errors. It's essential for tracking SEO progress.</p>
+      <h3>Why it matters</h3>
+      <p>Without it, you're guessing. With it, you can see whether "emergency plumber Sheffield" is actually showing your site, how many people click, and if Google has any crawl issues.</p>
+      <h3>Step-by-step setup</h3>
+      <ol>
+        <li>Go to search.google.com/search-console and sign in with your Google account.</li>
+        <li>Add your property (e.g. https://emergencyplumbersheffieldco.uk). Choose "URL prefix" and enter the full URL.</li>
+        <li>Verify ownership (HTML tag, DNS, or Google Analytics — your host or developer can help).</li>
+        <li>Submit your sitemap under "Sitemaps" in the left menu.</li>
+      </ol>
+      <h3>What to check weekly</h3>
+      <p>Performance tab: see which search terms and pages get impressions and clicks. Coverage: fix any "Error" or "Excluded" issues. Use the data to double down on keywords that already bring traffic and fix pages that aren't indexing.</p>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="section-title">Your 90-Day Action Plan</div>
+    <div class="report-body">
+      <p>A realistic, prioritised checklist so you can make progress without spending full-time on SEO.</p>
+      <h3>Weeks 1–4: Quick wins</h3>
+      <ul>
+        <li>Rewrite homepage title tag and meta description using your main keyword (e.g. Emergency Plumber Sheffield).</li>
+        <li>Claim and fully complete your Google Business Profile; add 5+ photos and a clear description.</li>
+        <li>Add or fix your phone number and area served on every page (header/footer).</li>
+        <li>Set up Google Search Console and submit your sitemap.</li>
+        <li>Ask 3–5 recent happy customers for a Google review.</li>
+      </ul>
+      <h3>Weeks 5–8: Building momentum</h3>
+      <ul>
+        <li>Add schema markup (Plumber/local business) to your homepage.</li>
+        <li>Create one new page or blog post (e.g. "What to do in a plumbing emergency in Sheffield").</li>
+        <li>Optimise 2–3 key service pages (title, meta description, one clear H1 each).</li>
+        <li>Post once a week on Google Business Profile (tip, offer, or update).</li>
+        <li>Get listed on 2–3 quality directories with consistent NAP.</li>
+      </ul>
+      <h3>Weeks 9–12: Long-term growth</h3>
+      <ul>
+        <li>Publish 2 more pieces of content from your content list (e.g. boiler checklist, frozen pipes).</li>
+        <li>Build a simple FAQ page and add schema for FAQ if possible.</li>
+        <li>Review Search Console data; improve or expand content for terms that already get impressions.</li>
+        <li>Continue asking for reviews and responding to all of them.</li>
+      </ul>
+      <p>Revisit this plan each month and adjust based on what's working in Search Console and GBP.</p>
+    </div>
+  </div>
+
+  <div class="cta-card">
+    <h2>Ready to see your report?</h2>
+    <p>Get a full SEO report tailored to your own website — including AI Search Visibility, competitor analysis, schema code, and your 90-day plan.</p>
+    <a href="/#tool" class="btn-cta">Get My SEO Report →</a>
+  </div>
+</div>
+</body>
+</html>
