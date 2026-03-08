@@ -1,4 +1,6 @@
 const Anthropic = require("@anthropic-ai/sdk");
+const https = require('https');
+const http = require('http');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -40,7 +42,7 @@ const TEASER_SYSTEM = `You are a world-class SEO specialist writing for NON-TECH
 Write in plain English — no jargon. Imagine you're explaining to a local tradesperson or shop owner who has never done SEO before.
 Avoid terms like "canonical tags", "crawlability", "SERP" without explaining them simply.
 
-This is a FREE PREVIEW. Your job is to make it genuinely useful and credible, but NOT fully actionable without the paid report.
+This is a FREE PREVIEW. Keep it higher-level and less actionable than the full report.
 
 Generate ONLY these 2 sections as a teaser:
 
@@ -49,8 +51,8 @@ Generate ONLY these 2 sections as a teaser:
 
 For each section:
 - Identify what the problems and opportunities ARE in plain English — name them clearly so the reader feels understood.
-- Do NOT give specific fixes, formulas, code, or step-by-step instructions. Tease the value; don't deliver the full solution.
-- End each section with a natural hook such as: "The full report shows you exactly how to fix this" (or similar).
+- Stop short of giving specific fixes, formulas, or step-by-step instructions. Be genuinely useful and credible, but not fully actionable without paying.
+- End each section with a natural hook like: "The full report shows you exactly how to fix this" (or similar). Do not give the actual how-to here.
 
 Use ## for section headings, ### for sub-headings, - for bullet points, **bold** for emphasis.
 Keep each section meaty and credible — this is what sells the full report.`;
@@ -104,6 +106,56 @@ Format as a clear prioritised checklist. Be realistic — this is a small busine
 
 Use ## for sections, ### for sub-headings, - for bullets, **bold** for key points, and include code blocks for any technical snippets.`;
 
+async function fetchWebsiteContent(url) {
+  return new Promise((resolve) => {
+    const protocol = url.startsWith('https') ? https : http;
+    const request = protocol.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; GetAProSEO/1.0; +https://getaproseo.com)',
+      },
+      timeout: 8000,
+    }, (response) => {
+      // Follow redirects
+      if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
+        fetchWebsiteContent(response.headers.location).then(resolve);
+        return;
+      }
+      let data = '';
+      response.on('data', (chunk) => { data += chunk; });
+      response.on('end', () => {
+        try {
+          // Extract useful content from HTML
+          const title = (data.match(/<title[^>]*>([^<]+)<\/title>/i) || [])[1] || '';
+          const metaDesc = (data.match(/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']/) || 
+                           data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']description["\']/) || [])[1] || '';
+          const h1s = [...data.matchAll(/<h1[^>]*>([^<]+)<\/h1>/gi)].map(m => m[1]).slice(0, 3).join(', ');
+          const h2s = [...data.matchAll(/<h2[^>]*>([^<]+)<\/h2>/gi)].map(m => m[1]).slice(0, 5).join(', ');
+          // Strip all HTML tags and get plain text, limit to 2000 chars
+          const plainText = data
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 2000);
+          resolve({
+            title,
+            metaDesc,
+            h1s,
+            h2s,
+            plainText,
+            success: true
+          });
+        } catch (e) {
+          resolve({ success: false });
+        }
+      });
+    });
+    request.on('error', () => resolve({ success: false }));
+    request.on('timeout', () => { request.destroy(); resolve({ success: false }); });
+  });
+}
+
 module.exports = async (req, res) => {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -131,12 +183,26 @@ module.exports = async (req, res) => {
 
   const system = isTeaser ? TEASER_SYSTEM : FULL_SYSTEM;
 
+  // Fetch the actual website content
+  const siteContent = await fetchWebsiteContent(url);
+
+  const websiteData = siteContent.success ? `
+ACTUAL WEBSITE DATA (fetched directly from the site — use this as your primary source of truth):
+- Page Title: ${siteContent.title}
+- Meta Description: ${siteContent.metaDesc || 'Not set'}
+- H1 Headings: ${siteContent.h1s || 'None found'}
+- H2 Headings: ${siteContent.h2s || 'None found'}
+- Page Content Preview: ${siteContent.plainText}
+` : 'Website content could not be fetched — base your analysis on the URL and any context provided.';
+
   const userMessage = `Please generate an SEO report for this website:
 
 Website URL: ${url}
 ${context ? `Business Description: ${context}` : ""}
 
-Be highly specific to this website and business type. Write everything in plain English that a non-technical business owner will understand and find genuinely useful.${isTeaser ? "\n\nRemember: generate ONLY the SEO Snapshot and Keyword Strategy sections." : ""}`;
+${websiteData}
+
+IMPORTANT: Base your entire report on the actual website data above. The business is located where the website says it is — do not assume a location. Be highly specific to this website and business type. Write everything in plain English that a non-technical business owner will understand and find genuinely useful.${isTeaser ? "\n\nRemember: generate ONLY the SEO Snapshot and Keyword Strategy sections." : ""}`;
 
   try {
     const message = await client.messages.create({

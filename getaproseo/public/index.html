@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/logo-icon.png">
 <meta name="google-site-verification" content="-fKjTFJ3P7R81-oZXEoMuJUZlXvbAg-Z4TyHUsb9R48" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GetAProSEO — Professional SEO Reports for Small Business Owners</title>
@@ -13,6 +14,8 @@
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://getaproseo.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,9 +28,9 @@
   --light-grey: #f1f3f5;
   --mid-grey: #868e96;
   --border: #e9ecef;
-  --accent: #2563eb;
-  --accent-dark: #1d4ed8;
-  --accent-light: #eff6ff;
+  --accent: #0d9488;
+  --accent-dark: #0f766e;
+  --accent-light: #f0fdfa;
   --green: #16a34a;
   --green-light: #f0fdf4;
   --red: #dc2626;
@@ -174,7 +177,7 @@ nav {
 
 .url-input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.12);
 }
 
 .context-input {
@@ -212,7 +215,7 @@ nav {
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-dark);
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+  box-shadow: 0 8px 20px rgba(13,148,136,0.28);
 }
 
 .btn-primary:disabled {
@@ -263,7 +266,7 @@ nav {
 
 .teaser-header {
   background: var(--accent-light);
-  border: 1px solid #bfdbfe;
+  border: 1px solid #99f6e4;
   border-radius: 12px;
   padding: 18px 20px;
   margin-bottom: 24px;
@@ -275,7 +278,7 @@ nav {
 .teaser-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
 
 .teaser-header h3 { font-size: 16px; font-weight: 700; color: var(--accent-dark); margin-bottom: 4px; }
-.teaser-header p { font-size: 13px; color: #3b82f6; }
+.teaser-header p { font-size: 13px; color: var(--accent); }
 
 .report-section {
   background: var(--white);
@@ -411,7 +414,7 @@ nav {
 .price-option-price { font-size: 22px; font-weight: 900; color: var(--black); }
 .price-option-sub { font-size: 11px; color: var(--mid-grey); margin-top: 2px; }
 .price-option.selected .price-option-label { color: var(--accent); }
-.price-option.selected .price-option-price { color: var(--accent-dark); }
+.price-option.selected .price-option-price { color: var(--accent); }
 
 .popular-badge {
   background: var(--accent);
@@ -441,7 +444,7 @@ nav {
 .btn-unlock:hover {
   background: var(--accent-dark);
   transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(37,99,235,0.25);
+  box-shadow: 0 8px 20px rgba(13,148,136,0.28);
 }
 
 .secure-note { font-size: 11px; color: #aaa; margin-top: 10px; }
@@ -565,7 +568,7 @@ nav {
   transform: translateY(-2px);
 }
 
-.feature-icon { font-size: 28px; margin-bottom: 12px; }
+.feature-icon { font-size: 28px; margin-bottom: 12px; color: var(--accent); display: block; }
 .feature-title { font-weight: 700; font-size: 16px; margin-bottom: 6px; }
 .feature-desc { font-size: 13px; color: var(--mid-grey); line-height: 1.6; }
 
@@ -643,11 +646,90 @@ footer a { color: #aaa; text-decoration: none; }
 .footer-logo { font-family: 'Playfair Display', serif; font-size: 20px; color: white; font-weight: 900; margin-bottom: 12px; }
 .footer-logo span { color: var(--accent); }
 
+/* ENTRANCE ANIMATIONS */
+.animate-fade-up {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.35s ease-out, transform 0.35s ease-out;
+}
+.animate-fade-up.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+.animate-fade-up[data-animate-stagger="0"] { transition-delay: 0ms; }
+.animate-fade-up[data-animate-stagger="1"] { transition-delay: 55ms; }
+.animate-fade-up[data-animate-stagger="2"] { transition-delay: 110ms; }
+.animate-fade-up[data-animate-stagger="3"] { transition-delay: 165ms; }
+.animate-fade-up[data-animate-stagger="4"] { transition-delay: 220ms; }
+.animate-fade-up[data-animate-stagger="5"] { transition-delay: 275ms; }
+.animate-fade-up[data-animate-on="scroll"][data-animate-delay="80"] { transition-delay: 80ms; }
+
 @media (max-width: 600px) {
   .tool-card { padding: 24px 18px; }
   .pricing-cards { grid-template-columns: 1fr; }
   .price-options { grid-template-columns: 1fr; }
   .unlock-card { padding: 28px 20px; }
+}
+
+@media (max-width: 768px) {
+  /* Nav — hide the badge on mobile */
+  nav .ai-badge { display: none; }
+
+  /* Hero — tighter padding */
+  .hero { padding: 32px 16px 24px; }
+
+  /* Hero title — smaller on mobile */
+  .hero h1 { font-size: 34px; margin-bottom: 14px; }
+
+  /* Hero subheading */
+  .hero-sub { font-size: 15px; margin-bottom: 20px; }
+
+  /* Stats row — force all 3 on one line */
+  .stats-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    margin-bottom: 24px;
+  }
+  .stats-row > div {
+    min-width: 0;
+    flex: 1;
+    text-align: center;
+  }
+  .stats-number { font-size: 26px !important; }
+  .stats-label { font-size: 10px !important; }
+
+  /* Tool card — tighter */
+  .tool-card { padding: 20px 16px; border-radius: 14px; }
+
+  /* Trust row — hide last item on mobile to prevent orphan */
+  .trust-item:last-child { display: none; }
+
+  /* Features section — 2 column grid, less padding */
+  .features { padding: 48px 16px; margin-top: 40px; }
+  .features-title { font-size: 26px; }
+  .features-sub { font-size: 14px; margin-bottom: 28px; }
+  .features-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px;
+  }
+  .feature-card { padding: 16px 12px; }
+  .feature-icon { font-size: 22px; margin-bottom: 8px; }
+  .feature-title { font-size: 13px; }
+  .feature-desc { font-size: 12px; }
+
+  /* Pricing — single column, less padding */
+  .pricing { padding: 48px 16px; }
+  .pricing-cards { grid-template-columns: 1fr; }
+  .pricing-card { padding: 24px 18px; }
+  .pricing-card-price { font-size: 36px; }
+
+  /* Unlock card — tighter */
+  .unlock-card { padding: 24px 16px; margin: 40px 8px 0; }
+  .unlock-card h2 { font-size: 22px; }
+  .price-options { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
@@ -655,19 +737,31 @@ footer a { color: #aaa; text-decoration: none; }
 
 <nav>
   <a class="nav-logo" href="/">GetAPro<span>SEO</span></a>
+  <span class="ai-badge" style="font-size:12px;color:#0d9488;font-weight:600;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;padding:5px 12px;">✦ Now includes AI Search Visibility</span>
   <a class="nav-cta" href="#tool">Get My SEO Report</a>
 </nav>
 
 <!-- HERO -->
 <section class="hero" id="tool">
-  <div class="hero-badge">
-    ✦ New — Now includes AI Search Visibility (ChatGPT & Google AI)
+  <h1 class="animate-fade-up" data-animate-on="load" data-animate-delay="50">Find out exactly why your website<br>isn't ranking on <em>Google</em></h1>
+  <p class="hero-sub animate-fade-up" data-animate-on="load" data-animate-delay="100">Your plain-English SEO report. No jargon. No agency. Results in 60 seconds.</p>
+<div class="stats-row" style="display:flex;justify-content:center;gap:48px;margin-bottom:40px;flex-wrap:wrap;">
+  <div style="text-align:center;">
+    <div class="stats-number" style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">60s</div>
+    <div class="stats-label" style="font-size:13px;color:#888;margin-top:4px;">Results in 60 seconds</div>
   </div>
-  <h1>Find out exactly why your website<br>isn't ranking on <em>Google</em></h1>
-  <p class="hero-sub">Get a complete, plain-English SEO report written for business owners — not tech experts. No jargon. No agency fees. Results in under 60 seconds.</p>
+  <div style="text-align:center;">
+    <div class="stats-number" style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">12</div>
+    <div class="stats-label" style="font-size:13px;color:#888;margin-top:4px;">Report sections</div>
+  </div>
+  <div style="text-align:center;">
+    <div class="stats-number" style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">90</div>
+    <div class="stats-label" style="font-size:13px;color:#888;margin-top:4px;">Day action plan included</div>
+  </div>
+</div>
 
   <!-- TOOL -->
-  <div class="tool-card">
+  <div class="tool-card animate-fade-up" data-animate-on="load" data-animate-delay="150">
     <div class="tool-card-header">
       <div class="tool-dot" style="background:#ef4444"></div>
       <div class="tool-dot" style="background:#f59e0b"></div>
@@ -803,35 +897,35 @@ footer a { color: #aaa; text-decoration: none; }
     <p class="features-sub">Every report is tailored to your specific website and business — no generic advice, no confusing jargon.</p>
 
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🎯</div>
+      <div class="feature-card animate-fade-up" data-animate-on="scroll" data-animate-stagger="0">
+        <div class="feature-icon ph-duotone ph-target"></div>
         <div class="feature-title">Plain English throughout</div>
-        <div class="feature-desc">Every recommendation explained in simple terms a non-technical business owner will understand and act on.</div>
+        <div class="feature-desc">No tech speak. Just clear actions you can take today.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🤖</div>
+      <div class="feature-card animate-fade-up" data-animate-on="scroll" data-animate-stagger="1">
+        <div class="feature-icon ph-duotone ph-robot"></div>
         <div class="feature-title">AI Search Visibility</div>
-        <div class="feature-desc">Find out how to appear in ChatGPT and Google AI answers — the biggest new SEO opportunity most businesses are missing.</div>
+        <div class="feature-desc">The biggest SEO opportunity most businesses don't know about yet.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔍</div>
+      <div class="feature-card animate-fade-up" data-animate-on="scroll" data-animate-stagger="2">
+        <div class="feature-icon ph-duotone ph-magnifying-glass"></div>
         <div class="feature-title">Competitor Analysis</div>
-        <div class="feature-desc">See who's outranking you on Google and exactly what they're doing differently — with specific steps to close the gap.</div>
+        <div class="feature-desc">Find out who's beating you and exactly how to close the gap.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📋</div>
+      <div class="feature-card animate-fade-up" data-animate-on="scroll" data-animate-stagger="3">
+        <div class="feature-icon ph-duotone ph-clipboard-text"></div>
         <div class="feature-title">90-Day Action Plan</div>
-        <div class="feature-desc">A prioritised week-by-week checklist so you know exactly what to do first, second, and third to improve your rankings.</div>
+        <div class="feature-desc">Know exactly what to do first, second, and third.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">💻</div>
+      <div class="feature-card animate-fade-up" data-animate-on="scroll" data-animate-stagger="4">
+        <div class="feature-icon ph-duotone ph-code"></div>
         <div class="feature-title">Schema Markup Code</div>
-        <div class="feature-desc">Real copy-paste code to help Google understand your business better — explained in plain English.</div>
+        <div class="feature-desc">Copy-paste code with zero technical knowledge needed.</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📄</div>
+      <div class="feature-card animate-fade-up" data-animate-on="scroll" data-animate-stagger="5">
+        <div class="feature-icon ph-duotone ph-file-pdf"></div>
         <div class="feature-title">Downloadable PDF</div>
-        <div class="feature-desc">Save and share your full report as a professional PDF — useful to share with your web developer or team.</div>
+        <div class="feature-desc">Save and share your report as a professional PDF.</div>
       </div>
     </div>
   </div>
@@ -844,7 +938,7 @@ footer a { color: #aaa; text-decoration: none; }
   <p style="color:var(--mid-grey);font-size:17px;max-width:500px;margin:0 auto">Pay once for a single report, or subscribe for unlimited reports every month.</p>
 
   <div class="pricing-cards">
-    <div class="pricing-card">
+    <div class="pricing-card animate-fade-up" data-animate-on="scroll">
       <div class="pricing-card-label">One-off report</div>
       <div class="pricing-card-price">£7.99</div>
       <div class="pricing-card-period">one-time payment</div>
@@ -858,7 +952,7 @@ footer a { color: #aaa; text-decoration: none; }
       </ul>
       <button class="pricing-card-btn" onclick="scrollToTool()">Get Started</button>
     </div>
-    <div class="pricing-card featured">
+    <div class="pricing-card featured animate-fade-up" data-animate-on="scroll" data-animate-delay="80">
       <div class="popular-badge" style="margin-bottom:8px">BEST VALUE</div>
       <div class="pricing-card-label">Monthly unlimited</div>
       <div class="pricing-card-price">£19.99</div>
@@ -867,7 +961,7 @@ footer a { color: #aaa; text-decoration: none; }
         <li><span class="check">✓</span> Unlimited SEO reports</li>
         <li><span class="check">✓</span> Everything in one-off plan</li>
         <li><span class="check">✓</span> Run reports for multiple sites</li>
-        <li><span class="check">✓</span> Track progress month to month</li>
+        <li><span class="check">✓</span> Run unlimited reports to track your own progress</li>
         <li><span class="check">✓</span> Priority support</li>
         <li><span class="check">✓</span> Cancel anytime</li>
       </ul>
@@ -879,8 +973,8 @@ footer a { color: #aaa; text-decoration: none; }
 <footer>
   <div class="footer-logo">GetAPro<span>SEO</span></div>
   <p style="margin-bottom:12px">Professional SEO reports for small business owners</p>
-  <p><a href="mailto:getaproseo@gmail.com">getaproseo@gmail.com</a> · <a href="/privacy">Privacy Policy</a> · <a href="/terms">Terms</a></p>
-  <p style="margin-top:16px;font-size:11px">© 2025 GetAProSEO. All rights reserved.</p>
+  <p><a href="mailto:hello@getaproseo.com">hello@getaproseo.com</a> · <a href="/privacy.html">Privacy Policy</a> · <a href="/terms.html">Terms of Service</a></p>
+  <p style="margin-top:16px;font-size:11px">© 2026 GetAProSEO. All rights reserved.</p>
 </footer>
 
 <script>
@@ -1101,8 +1195,8 @@ async function downloadPDF() {
     <title>SEO Report - ${url}</title>
     <style>
       body { font-family: Georgia, serif; max-width: 800px; margin: 40px auto; color: #222; line-height: 1.7; }
-      h1 { font-size: 28px; border-bottom: 3px solid #2563eb; padding-bottom: 12px; }
-      h2 { font-size: 20px; color: #2563eb; margin-top: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+      h1 { font-size: 28px; border-bottom: 3px solid #0d9488; padding-bottom: 12px; }
+      h2 { font-size: 20px; color: #0d9488; margin-top: 32px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
       h3 { font-size: 16px; margin-top: 20px; }
       p { margin-bottom: 10px; }
       ul { padding-left: 20px; }
@@ -1180,6 +1274,39 @@ window.addEventListener('load', async () => {
     }
   }
 });
+
+// Scroll-triggered entrance animations (Intersection Observer, no libraries)
+(function() {
+  function runOnLoadAnimations() {
+    var loadEls = document.querySelectorAll('[data-animate-on="load"]');
+    loadEls.forEach(function(el) {
+      var delay = parseInt(el.getAttribute('data-animate-delay'), 10) || 0;
+      el.style.transitionDelay = delay + 'ms';
+    });
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        loadEls.forEach(function(el) { el.classList.add('in-view'); });
+      });
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runOnLoadAnimations);
+  } else {
+    runOnLoadAnimations();
+  }
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      }
+    });
+  }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+
+  document.querySelectorAll('[data-animate-on="scroll"]').forEach(function(el) {
+    observer.observe(el);
+  });
+})();
 </script>
 
 <!-- Schema Markup -->

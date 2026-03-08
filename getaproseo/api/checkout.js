@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
   try {
     const sessionConfig = {
       payment_method_types: ["card"],
-      success_url: `${baseUrl}/?session_id={CHECKOUT_SESSION_ID}&url=${encodeURIComponent(url)}&context=${encodeURIComponent(context || "")}`,
+      success_url: `${baseUrl}/success.html?session_id={CHECKOUT_SESSION_ID}&url=${encodeURIComponent(url)}&context=${encodeURIComponent(context || "")}`,
       cancel_url: `${baseUrl}/?cancelled=true`,
       metadata: { url, context: context || "" },
     };
