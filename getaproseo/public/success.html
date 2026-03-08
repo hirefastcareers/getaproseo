@@ -34,7 +34,9 @@
   if (sessionId) {
     document.getElementById('status').textContent = 'Generating your report...';
     setTimeout(() => {
-      window.location.href = `/?session_id=${sessionId}&url=${encodeURIComponent(url || '')}&context=${encodeURIComponent(context || '')}`;
+      const rawUrl = params.get('url') || '';
+      const rawContext = params.get('context') || '';
+      window.location.href = `/?session_id=${sessionId}&url=${rawUrl}&context=${rawContext}`;
     }, 1500);
   } else {
     window.location.href = '/';
