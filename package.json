@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Professional SEO reports for small business owners",
   "scripts": {
+    "build": "npm install",
     "dev": "vercel dev"
   },
   "dependencies": {
@@ -11,3 +12,4 @@
     "stripe": "^14.0.0"
   }
 }
+
