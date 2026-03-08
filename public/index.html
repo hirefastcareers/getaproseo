@@ -1303,13 +1303,6 @@ async function downloadPDF() {
 
 // Check if returning from successful payment
 window.addEventListener('load', async () => {
-  // Clean URL immediately on load if session already processed
-  const alreadyProcessed = sessionStorage.getItem('processed-' + new URLSearchParams(window.location.search).get('session_id'));
-  if (alreadyProcessed) {
-    window.history.replaceState({}, '', '/');
-    return;
-  }
-
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
   const returnUrl = params.get('url');
