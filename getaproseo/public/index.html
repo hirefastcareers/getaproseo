@@ -774,7 +774,7 @@ footer a { color: #aaa; text-decoration: none; }
       <input class="url-input" id="urlInput" type="url" placeholder="https://yourwebsite.co.uk" />
 
       <div class="field-label">About your business <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#aaa">(optional but improves accuracy)</span></div>
-      <textarea class="context-input" id="contextInput" rows="2" placeholder="e.g. Local plumber in Sheffield covering S1-S35, emergency callouts and boiler installs"></textarea>
+      <textarea class="context-input" id="contextInput" rows="2" placeholder="e.g. Plumber covering emergency callouts and boiler installs"></textarea>
 
       <button class="btn-primary" id="generateBtn" onclick="generateTeaser()">
         ✦ Get My Free SEO Preview
@@ -1396,6 +1396,38 @@ window.addEventListener('load', async () => {
     observer.observe(el);
   });
 })();
+
+// Set localised placeholder based on user country
+async function setLocalisedPlaceholder() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    const country = data.country_code;
+    const city = data.city || '';
+
+    const placeholders = {
+      GB: `e.g. Plumber covering emergency callouts and boiler installs in ${city || 'the UK'}`,
+      US: `e.g. HVAC contractor serving residential and commercial clients in ${city || 'the US'}`,
+      AU: `e.g. Electrician covering residential rewiring and safety inspections in ${city || 'Australia'}`,
+      CA: `e.g. Landscaping company offering lawn care and snow removal in ${city || 'Canada'}`,
+      IE: `e.g. Accountant serving small businesses and sole traders in ${city || 'Ireland'}`,
+      NZ: `e.g. Builder specialising in new homes and renovations in ${city || 'New Zealand'}`,
+      DE: `e.g. Handwerker für Reparaturen und Renovierungen in ${city || 'Deutschland'}`,
+      FR: `e.g. Plombier intervenant en urgence à ${city || 'France'}`,
+      IT: `e.g. Idraulico per interventi urgenti e manutenzione a ${city || 'Italia'}`,
+      ES: `e.g. Fontanero para urgencias y mantenimiento en ${city || 'España'}`,
+      NL: `e.g. Loodgieter voor spoedreparaties in ${city || 'Nederland'}`,
+      default: `e.g. Plumber covering emergency callouts and boiler installs`
+    };
+
+    const placeholder = placeholders[country] || placeholders.default;
+    document.getElementById('contextInput').placeholder = placeholder;
+  } catch (e) {
+    // Silently fail — default placeholder stays
+  }
+}
+
+setLocalisedPlaceholder();
 </script>
 
 <!-- Schema Markup -->
