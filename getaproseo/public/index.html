@@ -1220,13 +1220,37 @@ function escHtml(str) {
 }
 
 function resetTool() {
+  // Show all hidden sections
+  document.querySelector('.hero').style.display = '';
+  document.querySelector('.features').style.display = '';
+  document.querySelector('.pricing').style.display = '';
+  document.querySelector('footer').style.display = '';
+
+  // Reset nav button
+  const navCta = document.querySelector('.nav-cta');
+  navCta.textContent = 'Get My SEO Report';
+  navCta.style.background = '';
+  navCta.style.fontSize = '';
+  navCta.href = '#tool';
+  navCta.onclick = null;
+
+  // Hide report
   document.getElementById('full-report').style.display = 'none';
+  document.getElementById('full-report-content').innerHTML = '';
+
+  // Reset tool inputs
   document.getElementById('input-section').style.display = 'block';
   document.getElementById('teaser-section').style.display = 'none';
+  document.getElementById('loading').style.display = 'none';
   document.getElementById('urlInput').value = '';
   document.getElementById('contextInput').value = '';
+
+  // Clean URL
+  window.history.replaceState({}, '', '/');
+
   currentUrl = '';
   currentContext = '';
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1303,35 +1327,54 @@ window.addEventListener('load', async () => {
         throw new Error('Payment not confirmed. Please contact support.');
       }
 
-      // Generate full report
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 90000);
-
-      let reportRes;
-      try {
-        reportRes = await fetch('/api/report', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: returnUrl, context: returnContext || '', type: 'full' }),
-          signal: controller.signal
-        });
-      } catch (err) {
-        if (err.name === 'AbortError') {
-          throw new Error('Report generation timed out. Please try again or contact hello@getaproseo.com for a full refund.');
-        }
-        throw err;
-      } finally {
-        clearTimeout(timeout);
-      }
-
-      const reportData = await reportRes.json();
-      if (!reportRes.ok) throw new Error(reportData.error || 'Failed to generate report');
-
+      // Generate full report with streaming
       stopLoadingMessages();
       document.getElementById('loading').style.display = 'none';
       document.getElementById('reportUrlDisplay').textContent = returnUrl;
-      document.getElementById('full-report-content').innerHTML = renderMarkdown(reportData.report);
       document.getElementById('full-report').style.display = 'block';
+      document.getElementById('full-report-content').innerHTML = '<div id="stream-content"></div>';
+      document.getElementById('full-report').scrollIntoView({ behavior: 'smooth' });
+
+      const streamRes = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: returnUrl,
+          context: returnContext || '',
+          type: 'full',
+          email: verifyData.email || ''
+        })
+      });
+
+      if (!streamRes.ok) {
+        const errData = await streamRes.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to generate report');
+      }
+
+      const reader = streamRes.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullReport = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.text) {
+                fullReport += data.text;
+                document.getElementById('stream-content').innerHTML = renderMarkdown(fullReport);
+              }
+              if (data.error) throw new Error(data.error);
+            } catch(e) {}
+          }
+        }
+      }
 
       // Update nav based on plan type
       const navCta = document.querySelector('.nav-cta');

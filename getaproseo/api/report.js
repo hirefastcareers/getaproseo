@@ -1,123 +1,15 @@
 const Anthropic = require("@anthropic-ai/sdk");
-const https = require('https');
-const http = require('http');
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-// In-memory IP rate limit for teaser: { count, firstRequestAt }
-const TEASER_RATE_LIMIT = new Map();
-const TEASER_MAX_PER_IP = 2;
-const TEASER_WINDOW_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-function getClientIp(req) {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (forwarded) {
-    const first = typeof forwarded === "string" ? forwarded.split(",")[0] : forwarded[0];
-    return (first || "").trim();
-  }
-  return req.socket?.remoteAddress || "";
-}
-
-function checkTeaserRateLimit(ip) {
-  if (!ip) return { allowed: true };
-  const now = Date.now();
-  let record = TEASER_RATE_LIMIT.get(ip);
-  if (!record) {
-    TEASER_RATE_LIMIT.set(ip, { count: 1, firstRequestAt: now });
-    return { allowed: true };
-  }
-  if (now - record.firstRequestAt > TEASER_WINDOW_MS) {
-    record = { count: 1, firstRequestAt: now };
-    TEASER_RATE_LIMIT.set(ip, record);
-    return { allowed: true };
-  }
-  if (record.count >= TEASER_MAX_PER_IP) {
-    return { allowed: false };
-  }
-  record.count += 1;
-  return { allowed: true };
-}
-
-const TEASER_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL website owners. 
-Write in plain English — no jargon. Imagine you're explaining to someone who has a website (blogger, freelancer, e-commerce, startup, charity, or any site owner) and has never done SEO before.
-Avoid terms like "canonical tags", "crawlability", "SERP" without explaining them simply.
-
-This is a FREE PREVIEW. Keep it higher-level and less actionable than the full report.
-
-Generate ONLY these 2 sections as a teaser:
-
-## SEO Snapshot
-## Keyword Strategy
-
-For each section:
-- Identify what the problems and opportunities ARE in plain English — name them clearly so the reader feels understood.
-- Stop short of giving specific fixes, formulas, or step-by-step instructions. Be genuinely useful and credible, but not fully actionable without paying.
-- End each section with a natural hook like: "The full report shows you exactly how to fix this" (or similar). Do not give the actual how-to here.
-
-Use ## for section headings, ### for sub-headings, - for bullet points, **bold** for emphasis.
-Keep each section meaty and credible — this is what sells the full report.`;
-
-const FULL_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL website owners.
-Write in plain, friendly English — imagine explaining to someone who has a website (blogger, freelancer, e-commerce, startup, charity, or any site owner).
-No jargon without explanation. Be warm, specific, and genuinely actionable.
-Every recommendation must feel tailored to THIS specific website.
-
-Generate ALL of these sections:
-
-## SEO Snapshot
-A plain English summary of how Google likely sees this site right now. What are the top 3 biggest opportunities? Write like you're a trusted advisor giving honest feedback over a coffee.
-
-## Keyword Strategy
-Primary keywords (explain what "search intent" means simply), long-tail opportunities, and local keywords only if the site has a local presence. Give real keyword examples they could actually target.
-
-## On-Page SEO
-Title tag formula + real example for their homepage. Meta description formula + example. Heading structure explained simply. What to write and how much.
-
-## Technical SEO
-Explain technical issues in plain English — no jargon. Core Web Vitals explained simply. Mobile checklist. What a sitemap is and why it matters.
-
-## Content Strategy
-10 specific blog or page topics they should create. Explain WHY each one will help. Content calendar idea. FAQ page ideas.
-
-## Local SEO & Google Business Profile (if relevant)
-Only include this section if the website has a local presence (e.g. business with a physical location, venue, or local service area). Step by step Google Business Profile optimisation. Review strategy. Local keywords. Explain what a Google Business Profile IS first. If the site is not local-focused (e.g. purely online, blog, SaaS), briefly say why this section doesn't apply and skip it.
-
-## AI Search Visibility (NEW — ChatGPT & Google AI)
-This is cutting edge — explain that Google and ChatGPT now answer questions directly without people clicking links. How can this website get mentioned in those AI answers? Specific tactics for appearing in ChatGPT, Google AI Overviews, and Perplexity. This is a huge new opportunity most website owners don't know about yet.
-
-## Competitor Analysis
-Who are their likely top 3 Google competitors based on their niche? What are those competitors probably doing better? What gaps can this site exploit? Be specific.
-
-## Schema Markup (Rich Results)
-Explain what schema markup IS in plain English (it's like giving Google extra information about your website). Provide actual JSON-LD code they can paste into their website.
-
-## Backlink Building
-Plain English explanation of what backlinks are and why they matter. 5-10 specific, realistic tactics for this type of website to get quality backlinks.
-
-## Google Search Console Setup
-What is Google Search Console? Why does it matter? Step by step setup guide. What to look at weekly. What the numbers mean.
-
-## Your 90-Day Action Plan
-Week 1-4: Quick wins — what to do first and why
-Week 5-8: Building momentum  
-Week 9-12: Long term growth
-
-Format as a clear prioritised checklist. Be realistic — the reader may not be a full-time marketer.
-
-Use ## for sections, ### for sub-headings, - for bullets, **bold** for key points, and include code blocks for any technical snippets.
-
-Never include raw HTML tags, XML, or code snippets in your response unless they are inside a markdown code block (\`\`\`). Do not output heading structure examples as raw HTML. Do not output sitemap XML as raw text.`;
+const client = new Anthropic();
 
 async function fetchWebsiteContent(url) {
+  const https = require('https');
+  const http = require('http');
   return new Promise((resolve) => {
     const protocol = url.startsWith('https') ? https : http;
     const request = protocol.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; GetAProSEO/1.0; +https://getaproseo.com)',
-      },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; GetAProSEO/1.0; +https://getaproseo.com)' },
       timeout: 8000,
     }, (response) => {
-      // Follow redirects
       if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
         fetchWebsiteContent(response.headers.location).then(resolve);
         return;
@@ -126,13 +18,11 @@ async function fetchWebsiteContent(url) {
       response.on('data', (chunk) => { data += chunk; });
       response.on('end', () => {
         try {
-          // Extract useful content from HTML
           const title = (data.match(/<title[^>]*>([^<]+)<\/title>/i) || [])[1] || '';
-          const metaDesc = (data.match(/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']/) || 
+          const metaDesc = (data.match(/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']/) ||
                            data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']description["\']/) || [])[1] || '';
           const h1s = [...data.matchAll(/<h1[^>]*>([^<]+)<\/h1>/gi)].map(m => m[1]).slice(0, 3).join(', ');
           const h2s = [...data.matchAll(/<h2[^>]*>([^<]+)<\/h2>/gi)].map(m => m[1]).slice(0, 5).join(', ');
-          // Strip all HTML tags and get plain text, limit to 2000 chars
           const plainText = data
             .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
             .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
@@ -140,17 +30,8 @@ async function fetchWebsiteContent(url) {
             .replace(/\s+/g, ' ')
             .trim()
             .slice(0, 2000);
-          resolve({
-            title,
-            metaDesc,
-            h1s,
-            h2s,
-            plainText,
-            success: true
-          });
-        } catch (e) {
-          resolve({ success: false });
-        }
+          resolve({ title, metaDesc, h1s, h2s, plainText, success: true });
+        } catch (e) { resolve({ success: false }); }
       });
     });
     request.on('error', () => resolve({ success: false }));
@@ -158,71 +39,169 @@ async function fetchWebsiteContent(url) {
   });
 }
 
+async function generatePDFAndEmail(fullText, url, email) {
+  if (!email || !process.env.RESEND_API_KEY) return;
+  try {
+    // Convert markdown to simple HTML for PDF
+    const htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  body { font-family: Georgia, serif; max-width: 800px; margin: 40px auto; color: #222; line-height: 1.7; padding: 20px; }
+  h1 { font-size: 28px; border-bottom: 3px solid #0d9488; padding-bottom: 12px; color: #0a0a0a; }
+  h2 { font-size: 22px; color: #0d9488; margin-top: 36px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+  h3 { font-size: 16px; margin-top: 20px; color: #0a0a0a; }
+  p { margin-bottom: 12px; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  code { background: #f1f5f9; padding: 2px 6px; border-radius: 3px; font-size: 12px; }
+  pre { background: #1e293b; color: #e2e8f0; padding: 16px; border-radius: 8px; font-size: 12px; overflow-x: auto; }
+  .header { color: #666; font-size: 13px; margin-bottom: 32px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
+  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+</style>
+</head>
+<body>
+<h1>SEO Report — GetAProSEO</h1>
+<div class="header">Website: ${url} · Generated: ${new Date().toLocaleDateString('en-GB')} · getaproseo.com</div>
+${fullText
+  .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+  .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+  .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  .replace(/^- (.+)$/gm, '<li>$1</li>')
+  .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+  .replace(/\n\n/g, '</p><p>')
+  .replace(/^(?!<[hul])/gm, '<p>')
+  .replace(/(?<![>])\n/g, '</p>')}
+<div class="footer">Generated by GetAProSEO · getaproseo.com · Plain English SEO Reports</div>
+</body>
+</html>`;
+
+    const htmlBuffer = Buffer.from(htmlContent, 'utf-8');
+    const base64HTML = htmlBuffer.toString('base64');
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'GetAProSEO <hello@getaproseo.com>',
+        to: email,
+        subject: `Your SEO Report is Ready — ${url}`,
+        html: `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px;">
+          <h1 style="font-size:22px;color:#0a0a0a;">Your SEO report is attached! 🎉</h1>
+          <p style="color:#555;line-height:1.6;">Your full 12-section SEO report for <strong>${url}</strong> is attached to this email as an HTML file.</p>
+          <p style="color:#555;line-height:1.6;">Open the attachment in any browser to read your full report. You can also print it or save it as a PDF from your browser.</p>
+          <p style="color:#555;line-height:1.6;">If you have any questions, just reply to this email.</p>
+          <p style="color:#555;line-height:1.6;">Thanks,<br>Tom at GetAProSEO</p>
+          <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
+          <p style="font-size:12px;color:#aaa;">GetAProSEO · <a href="https://getaproseo.com">getaproseo.com</a></p>
+        </div>`,
+        attachments: [{
+          filename: `SEO-Report-${url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-')}.html`,
+          content: base64HTML,
+        }]
+      })
+    });
+  } catch (e) {
+    console.error('Email with attachment failed:', e);
+  }
+}
+
+// IP rate limiting
+const ipRequests = new Map();
+
 module.exports = async (req, res) => {
-  // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { url, context, type } = req.body;
+  const { url, context, type, email } = req.body;
+  if (!url) return res.status(400).json({ error: "URL required" });
 
-  if (!url) return res.status(400).json({ error: "URL is required" });
-
-  const isTeaser = type === "teaser";
-  if (isTeaser) {
-    const clientIp = getClientIp(req);
-    const { allowed } = checkTeaserRateLimit(clientIp);
-    if (!allowed) {
-      return res.status(429).json({
-        error: "You've used your free previews. Please unlock the full report to continue.",
-        limitReached: true,
-      });
+  // Rate limit free previews
+  if (type === 'teaser') {
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const now = Date.now();
+    const requests = ipRequests.get(ip) || [];
+    const recent = requests.filter(t => now - t < 24 * 60 * 60 * 1000);
+    if (recent.length >= 2) {
+      return res.status(429).json({ error: "You've used your free previews for today. Please try again tomorrow or unlock the full report." });
     }
+    recent.push(now);
+    ipRequests.set(ip, recent);
   }
 
-  const system = isTeaser ? TEASER_SYSTEM : FULL_SYSTEM;
-
-  // Fetch the actual website content
+  const isTeaser = type === 'teaser';
   const siteContent = await fetchWebsiteContent(url);
-
   const websiteData = siteContent.success ? `
-ACTUAL WEBSITE DATA (fetched directly from the site — use this as your primary source of truth):
+ACTUAL WEBSITE DATA (fetched directly — use as primary source of truth):
 - Page Title: ${siteContent.title}
 - Meta Description: ${siteContent.metaDesc || 'Not set'}
 - H1 Headings: ${siteContent.h1s || 'None found'}
 - H2 Headings: ${siteContent.h2s || 'None found'}
 - Page Content Preview: ${siteContent.plainText}
-` : 'Website content could not be fetched — base your analysis on the URL and any context provided.';
+` : 'Website content could not be fetched — base analysis on the URL and context provided.';
 
-  const userMessage = `Please generate an SEO report for this website:
+  const systemPrompt = `You are an expert SEO consultant writing plain-English SEO reports for website owners. Your reports are specific, actionable, and written so anyone can understand them — no technical jargon unless you explain it simply. Never use generic advice. Always base your report on the actual website data provided. Never include raw HTML tags, XML, or code snippets outside of markdown code blocks. Do not output heading structure examples as raw HTML. Do not output sitemap XML as raw text.`;
 
-Website URL: ${url}
-${context ? `Business Description: ${context}` : ""}
+  const userMessage = isTeaser
+    ? `Generate a FREE PREVIEW SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\nIMPORTANT: Generate ONLY these 2 sections:\n## SEO Snapshot\n## Keyword Strategy\n\nMake the preview genuinely useful but leave the reader wanting more. Do not mention the other sections exist.`
+    : `Generate a FULL SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\nIMPORTANT: Base your entire report on the actual website data above. Generate ALL 12 sections:\n## SEO Snapshot\n## Keyword Strategy\n## On-Page SEO\n## Technical SEO\n## Content Strategy\n## Local SEO & Google Business Profile\n## AI Search Visibility\n## Competitor Analysis\n## Schema Markup\n## Backlink Building\n## Google Search Console\n## 90-Day Action Plan\n\nBe highly specific to this website. Write in plain English. Never output raw HTML or XML.`;
 
-${websiteData}
+  // Use SSE streaming for full reports
+  if (!isTeaser) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
-IMPORTANT: Base your entire report on the actual website data above. Do not assume the site is a local or small business — it could be a blog, e-commerce store, startup, charity, or any website. Be highly specific to this website. Write everything in plain English that a non-technical website owner will understand and find genuinely useful.${isTeaser ? "\n\nRemember: generate ONLY the SEO Snapshot and Keyword Strategy sections." : ""}`;
+    let fullText = '';
 
-  try {
-    const message = await client.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: isTeaser ? 1500 : 6000,
-      system,
-      messages: [{ role: "user", content: userMessage }],
-    });
+    try {
+      const stream = await client.messages.stream({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 4000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }]
+      });
 
-    const text = message.content
-      .filter((b) => b.type === "text")
-      .map((b) => b.text)
-      .join("")
-      .trim();
+      for await (const chunk of stream) {
+        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+          const text = chunk.delta.text;
+          fullText += text;
+          res.write(`data: ${JSON.stringify({ text })}\n\n`);
+        }
+      }
 
-    res.status(200).json({ report: text, type: isTeaser ? "teaser" : "full" });
-  } catch (error) {
-    console.error("Anthropic error:", error);
-    res.status(500).json({ error: error.message || "Failed to generate report" });
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+
+      // Send email with report attached after streaming completes
+      if (email) {
+        await generatePDFAndEmail(fullText, url, email);
+      }
+
+    } catch (err) {
+      res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+      res.end();
+    }
+
+  } else {
+    // Teaser — regular JSON response
+    try {
+      const message = await client.messages.create({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 1500,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userMessage }]
+      });
+      res.status(200).json({ report: message.content[0].text });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
   }
 };
