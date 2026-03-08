@@ -38,8 +38,8 @@ function checkTeaserRateLimit(ip) {
   return { allowed: true };
 }
 
-const TEASER_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL small business owners. 
-Write in plain English — no jargon. Imagine you're explaining to a local tradesperson or shop owner who has never done SEO before.
+const TEASER_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL website owners. 
+Write in plain English — no jargon. Imagine you're explaining to someone who has a website (blogger, freelancer, e-commerce, startup, charity, or any site owner) and has never done SEO before.
 Avoid terms like "canonical tags", "crawlability", "SERP" without explaining them simply.
 
 This is a FREE PREVIEW. Keep it higher-level and less actionable than the full report.
@@ -57,10 +57,10 @@ For each section:
 Use ## for section headings, ### for sub-headings, - for bullet points, **bold** for emphasis.
 Keep each section meaty and credible — this is what sells the full report.`;
 
-const FULL_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL small business owners.
-Write in plain, friendly English — imagine explaining to a local tradesperson or shop owner.
+const FULL_SYSTEM = `You are a world-class SEO specialist writing for NON-TECHNICAL website owners.
+Write in plain, friendly English — imagine explaining to someone who has a website (blogger, freelancer, e-commerce, startup, charity, or any site owner).
 No jargon without explanation. Be warm, specific, and genuinely actionable.
-Every recommendation must feel tailored to THIS specific business.
+Every recommendation must feel tailored to THIS specific website.
 
 Generate ALL of these sections:
 
@@ -68,7 +68,7 @@ Generate ALL of these sections:
 A plain English summary of how Google likely sees this site right now. What are the top 3 biggest opportunities? Write like you're a trusted advisor giving honest feedback over a coffee.
 
 ## Keyword Strategy
-Primary keywords (explain what "search intent" means simply), long-tail opportunities, local keywords if relevant. Give real keyword examples they could actually target.
+Primary keywords (explain what "search intent" means simply), long-tail opportunities, and local keywords only if the site has a local presence. Give real keyword examples they could actually target.
 
 ## On-Page SEO
 Title tag formula + real example for their homepage. Meta description formula + example. Heading structure explained simply. What to write and how much.
@@ -79,20 +79,20 @@ Explain technical issues in plain English — no jargon. Core Web Vitals explain
 ## Content Strategy
 10 specific blog or page topics they should create. Explain WHY each one will help. Content calendar idea. FAQ page ideas.
 
-## Local SEO & Google Business Profile
-Step by step Google Business Profile optimisation. Review strategy. Local keywords. Explain what a Google Business Profile IS first.
+## Local SEO & Google Business Profile (if relevant)
+Only include this section if the website has a local presence (e.g. business with a physical location, venue, or local service area). Step by step Google Business Profile optimisation. Review strategy. Local keywords. Explain what a Google Business Profile IS first. If the site is not local-focused (e.g. purely online, blog, SaaS), briefly say why this section doesn't apply and skip it.
 
 ## AI Search Visibility (NEW — ChatGPT & Google AI)
-This is cutting edge — explain that Google and ChatGPT now answer questions directly without people clicking links. How can THIS business get mentioned in those AI answers? Specific tactics for appearing in ChatGPT, Google AI Overviews, and Perplexity. This is a huge new opportunity most businesses don't know about yet.
+This is cutting edge — explain that Google and ChatGPT now answer questions directly without people clicking links. How can this website get mentioned in those AI answers? Specific tactics for appearing in ChatGPT, Google AI Overviews, and Perplexity. This is a huge new opportunity most website owners don't know about yet.
 
 ## Competitor Analysis
-Who are their likely top 3 Google competitors based on their niche/location? What are those competitors probably doing better? What gaps can this business exploit? Be specific.
+Who are their likely top 3 Google competitors based on their niche? What are those competitors probably doing better? What gaps can this site exploit? Be specific.
 
 ## Schema Markup (Rich Results)
-Explain what schema markup IS in plain English (it's like giving Google extra information about your business). Provide actual JSON-LD code they can paste into their website.
+Explain what schema markup IS in plain English (it's like giving Google extra information about your website). Provide actual JSON-LD code they can paste into their website.
 
 ## Backlink Building
-Plain English explanation of what backlinks are and why they matter. 5-10 specific, realistic tactics for THIS type of business to get quality backlinks.
+Plain English explanation of what backlinks are and why they matter. 5-10 specific, realistic tactics for this type of website to get quality backlinks.
 
 ## Google Search Console Setup
 What is Google Search Console? Why does it matter? Step by step setup guide. What to look at weekly. What the numbers mean.
@@ -102,7 +102,7 @@ Week 1-4: Quick wins — what to do first and why
 Week 5-8: Building momentum  
 Week 9-12: Long term growth
 
-Format as a clear prioritised checklist. Be realistic — this is a small business owner, not a full time marketer.
+Format as a clear prioritised checklist. Be realistic — the reader may not be a full-time marketer.
 
 Use ## for sections, ### for sub-headings, - for bullets, **bold** for key points, and include code blocks for any technical snippets.
 
@@ -204,7 +204,7 @@ ${context ? `Business Description: ${context}` : ""}
 
 ${websiteData}
 
-IMPORTANT: Base your entire report on the actual website data above. The business is located where the website says it is — do not assume a location. Be highly specific to this website and business type. Write everything in plain English that a non-technical business owner will understand and find genuinely useful.${isTeaser ? "\n\nRemember: generate ONLY the SEO Snapshot and Keyword Strategy sections." : ""}`;
+IMPORTANT: Base your entire report on the actual website data above. Do not assume the site is a local or small business — it could be a blog, e-commerce store, startup, charity, or any website. Be highly specific to this website. Write everything in plain English that a non-technical website owner will understand and find genuinely useful.${isTeaser ? "\n\nRemember: generate ONLY the SEO Snapshot and Keyword Strategy sections." : ""}`;
 
   try {
     const message = await client.messages.create({
