@@ -1,8 +1,12 @@
 {
   "version": 2,
+  "functions": {
+    "api/report.js": {
+      "maxDuration": 60
+    }
+  },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/success.html", "destination": "/public/success.html" },
     { "source": "/(.*)", "destination": "/public/$1" }
   ]
 }
