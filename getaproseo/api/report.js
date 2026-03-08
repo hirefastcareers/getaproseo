@@ -92,16 +92,15 @@ ${fullText
         subject: `Your SEO Report is Ready — ${url}`,
         html: `<div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px;">
           <h1 style="font-size:22px;color:#0a0a0a;">Your SEO report is attached! 🎉</h1>
-          <p style="color:#555;line-height:1.6;">Your full 12-section SEO report for <strong>${url}</strong> is attached to this email as an HTML file.</p>
-          <p style="color:#555;line-height:1.6;">Open the attachment in any browser to read your full report. You can also print it or save it as a PDF from your browser.</p>
+          <p style="color:#555;line-height:1.6;">Your full 12-section SEO report for <strong>${url}</strong> is attached as a text file. Open it in any text editor or word processor to read your full report.</p>
           <p style="color:#555;line-height:1.6;">If you have any questions, just reply to this email.</p>
           <p style="color:#555;line-height:1.6;">Thanks,<br>Tom at GetAProSEO</p>
           <hr style="border:none;border-top:1px solid #eee;margin:24px 0;">
           <p style="font-size:12px;color:#aaa;">GetAProSEO · <a href="https://getaproseo.com">getaproseo.com</a></p>
         </div>`,
         attachments: [{
-          filename: `SEO-Report-${url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-')}.html`,
-          content: base64HTML,
+          filename: `SEO-Report-${url.replace(/https?:\/\//, '').replace(/[^a-z0-9]/gi, '-')}.txt`,
+          content: Buffer.from(fullText, 'utf-8').toString('base64'),
         }]
       })
     });

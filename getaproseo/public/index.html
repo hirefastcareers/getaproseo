@@ -13,6 +13,21 @@
 <meta property="og:url" content="https://getaproseo.com">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://getaproseo.com">
+<script>
+  // Hide sections immediately if returning from payment
+  if (window.location.search.includes('session_id')) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var hero = document.querySelector('.hero');
+      var features = document.querySelector('.features');
+      var pricing = document.querySelector('.pricing');
+      var footer = document.querySelector('footer');
+      if (hero) hero.style.display = 'none';
+      if (features) features.style.display = 'none';
+      if (pricing) pricing.style.display = 'none';
+      if (footer) footer.style.display = 'none';
+    });
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
