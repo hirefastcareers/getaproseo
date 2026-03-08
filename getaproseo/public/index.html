@@ -1303,6 +1303,13 @@ async function downloadPDF() {
 
 // Check if returning from successful payment
 window.addEventListener('load', async () => {
+  // Clean URL immediately on load if session already processed
+  const alreadyProcessed = sessionStorage.getItem('processed-' + new URLSearchParams(window.location.search).get('session_id'));
+  if (alreadyProcessed) {
+    window.history.replaceState({}, '', '/');
+    return;
+  }
+
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
   const returnUrl = params.get('url');
@@ -1390,6 +1397,10 @@ window.addEventListener('load', async () => {
           }
         }
       }
+
+      // Mark this session as processed so it doesn't retrigger
+      sessionStorage.setItem('processed-' + sessionId, '1');
+      window.history.replaceState({}, '', '/');
 
       // Update nav based on plan type
       const navCta = document.querySelector('.nav-cta');
