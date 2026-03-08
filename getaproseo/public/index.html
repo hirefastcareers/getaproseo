@@ -1364,7 +1364,8 @@ window.addEventListener('load', async () => {
           url: returnUrl,
           context: returnContext || '',
           type: 'full',
-          email: verifyData.email || ''
+          email: verifyData.email || '',
+          session_id: sessionId
         })
       });
 
