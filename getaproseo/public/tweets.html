@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tweet Manager — GetAProSEO</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal: #0d9488;
+    --teal-dark: #0a7a70;
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --card: #141414;
+    --card-posted: #0f0f0f;
+    --border: #222;
+    --border-light: #2a2a2a;
+    --mid: #666;
+    --light: #aaa;
+    --green: #16a34a;
+    --red: #ef4444;
+    --blue: #2563eb;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--black);
+    color: var(--white);
+    min-height: 100vh;
+  }
+
+  /* LOCK SCREEN */
+  #lock-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+  }
+
+  .lock-card {
+    background: #141414;
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    padding: 48px 40px;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .lock-icon {
+    font-size: 40px;
+    margin-bottom: 20px;
+  }
+
+  .lock-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+
+  .lock-card p {
+    color: var(--mid);
+    font-size: 14px;
+    margin-bottom: 28px;
+  }
+
+  .lock-input {
+    width: 100%;
+    background: #0a0a0a;
+    border: 1.5px solid var(--border-light);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 16px;
+    font-family: inherit;
+    color: var(--white);
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+    text-align: center;
+    letter-spacing: 3px;
+  }
+
+  .lock-input:focus { border-color: var(--teal); }
+
+  .lock-btn {
+    width: 100%;
+    background: var(--teal);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .lock-btn:hover { background: var(--teal-dark); }
+
+  .lock-error {
+    color: var(--red);
+    font-size: 13px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* NAV */
+  nav {
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--teal); }
+
+  .nav-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--teal);
+    background: rgba(13,148,136,0.1);
+    border: 1px solid rgba(13,148,136,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--teal) 0%, var(--teal-dark) 100%);
+    padding: 32px 24px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .header-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+  }
+
+  .header-sub {
+    font-size: 13px;
+    opacity: 0.75;
+    margin-top: 4px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .stat-box {
+    text-align: center;
+    background: rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px 20px;
+    min-width: 64px;
+  }
+
+  .stat-num {
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 3px;
+  }
+
+  /* MAIN */
+  .main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  /* CONTROLS */
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .filter-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: #1a1a1a;
+    color: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .filter-btn.active { background: var(--teal); border-color: var(--teal); color: white; }
+
+  .generate-btn {
+    background: linear-gradient(135deg, var(--blue), #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+  }
+
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .spinner {
+    width: 13px;
+    height: 13px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TWEET CARDS */
+  .tweets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tweet-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: all 0.2s;
+  }
+
+  .tweet-card.posted {
+    background: var(--card-posted);
+    border-color: #1a2a1a;
+    opacity: 0.6;
+  }
+
+  .tweet-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    gap: 10px;
+  }
+
+  .tweet-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  .tweet-badge.queued {
+    color: var(--teal);
+    background: rgba(13,148,136,0.1);
+    border: 1px solid rgba(13,148,136,0.25);
+  }
+
+  .tweet-badge.posted {
+    color: var(--green);
+    background: rgba(22,163,74,0.1);
+    border: 1px solid rgba(22,163,74,0.25);
+  }
+
+  .tweet-charcount {
+    font-size: 11px;
+    color: var(--mid);
+  }
+
+  .tweet-text {
+    font-size: 14px;
+    line-height: 1.75;
+    color: #ddd;
+    white-space: pre-wrap;
+    margin-bottom: 14px;
+    word-break: break-word;
+  }
+
+  .tweet-text.clamped {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .expand-btn {
+    background: none;
+    border: none;
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0 0 12px;
+    display: block;
+  }
+
+  .tweet-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .btn {
+    border-radius: 7px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+
+  .btn-copy {
+    background: #1e1e1e;
+    color: var(--white);
+    border-color: var(--border-light);
+  }
+
+  .btn-copy:hover, .btn-copy.copied {
+    background: var(--teal);
+    border-color: var(--teal);
+  }
+
+  .btn-edit {
+    background: #1e1e1e;
+    color: var(--light);
+    border-color: var(--border-light);
+  }
+
+  .btn-edit:hover { border-color: #555; color: white; }
+
+  .btn-posted {
+    background: rgba(22,163,74,0.1);
+    color: var(--green);
+    border-color: rgba(22,163,74,0.3);
+  }
+
+  .btn-posted:hover { background: rgba(22,163,74,0.2); }
+
+  .btn-unmark {
+    background: #1e1e1e;
+    color: var(--light);
+    border-color: var(--border-light);
+  }
+
+  .btn-delete {
+    background: rgba(239,68,68,0.08);
+    color: var(--red);
+    border-color: rgba(239,68,68,0.2);
+    margin-left: auto;
+  }
+
+  .btn-delete:hover { background: rgba(239,68,68,0.15); }
+
+  /* EDIT MODE */
+  .edit-area {
+    width: 100%;
+    background: #0a0a0a;
+    border: 1.5px solid var(--teal);
+    border-radius: 8px;
+    padding: 12px;
+    color: var(--white);
+    font-size: 14px;
+    line-height: 1.7;
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+    margin-bottom: 10px;
+  }
+
+  .edit-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .char-counter {
+    font-size: 12px;
+    color: var(--mid);
+  }
+
+  .char-counter.warn { color: #f59e0b; }
+  .char-counter.over { color: var(--red); }
+
+  .edit-btns { display: flex; gap: 8px; }
+
+  .btn-save {
+    background: var(--teal);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .btn-cancel {
+    background: #222;
+    color: var(--light);
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--mid);
+  }
+
+  .empty-state .emoji { font-size: 36px; margin-bottom: 12px; }
+  .empty-state p { font-size: 15px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--teal);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 999;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    .lock-card { padding: 36px 24px; }
+    .header { padding: 24px 16px; }
+    .header h1 { font-size: 22px; }
+    .stat-box { padding: 8px 14px; min-width: 54px; }
+    .stat-num { font-size: 20px; }
+    .controls { flex-direction: column; align-items: stretch; }
+    .generate-btn { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h2>Tweet Manager</h2>
+    <p>Enter your password to access your GetAProSEO tweet library</p>
+    <input class="lock-input" type="password" id="password-input" placeholder="••••••••••••••" />
+    <button class="lock-btn" onclick="checkPassword()">Enter</button>
+    <div class="lock-error" id="lock-error">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;">
+
+  <nav>
+    <a class="nav-logo" href="/">GetAPro<span>SEO</span></a>
+    <span class="nav-badge">Tweet Manager</span>
+  </nav>
+
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <h1>Tweet Manager</h1>
+        <div class="header-sub">@GetAProSEO · Schedule &amp; track your posts</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-num" id="stat-total">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-queued">0</div>
+          <div class="stat-label">Queued</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="stat-posted">0</div>
+          <div class="stat-label">Posted</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="controls">
+      <div class="filter-group">
+        <button class="filter-btn active" id="filter-all" onclick="setFilter('all')">All (<span id="count-all">0</span>)</button>
+        <button class="filter-btn" id="filter-queued" onclick="setFilter('queued')">Queued (<span id="count-queued">0</span>)</button>
+        <button class="filter-btn" id="filter-posted" onclick="setFilter('posted')">Posted (<span id="count-posted">0</span>)</button>
+      </div>
+      <button class="generate-btn" id="generate-btn" onclick="generateMore()">
+        <span class="spinner" id="gen-spinner"></span>
+        <span id="gen-label">✦ Generate 10 More</span>
+      </button>
+    </div>
+
+    <div class="tweets-list" id="tweets-list"></div>
+    <div class="empty-state" id="empty-state" style="display:none;">
+      <div class="emoji">📭</div>
+      <p>No tweets here yet</p>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PASSWORD = 'getaproseo2026';
+const STORAGE_KEY = 'getaproseo-tweets';
+
+const INITIAL_TWEETS = [
+  "Most small business websites have the same 3 SEO problems.\n\n→ Wrong keywords on the homepage\n→ No Google Business Profile\n→ Zero backlinks from local sites\n\nFix these and you'll outrank 80% of your competitors.",
+  "Your website title tag is the single most important line of text on your site.\n\nMost business owners leave it as \"Home\" or their business name.\n\nGoogle doesn't know what you do. Neither does anyone searching for you.",
+  "Hot take: Most small businesses don't need an SEO agency.\n\nThey need to understand 5 basics:\n→ Title tags\n→ Meta descriptions\n→ Google Business Profile\n→ Local keywords\n→ Mobile speed\n\nThat's it. Everything else comes later.",
+  "I built a tool that generates a full 12-section SEO report for any website in 60 seconds.\n\nPlain English. No jargon. No agency fees.\n\nFrom £7.99.\n\nFind out exactly why your site isn't ranking → getaproseo.com",
+  "\"Why isn't my website showing up on Google?\"\n\nI hear this from small business owners constantly.\n\n99% of the time it's one of these:\n→ No keyword in the title tag\n→ Not listed on Google Maps\n→ Website loads too slowly on mobile\n\nWhich one is hurting you?",
+  "SEO agencies charge £500-£2,000/month.\n\nFor a local plumber, electrician or hairdresser — that's insane.\n\nYou don't need an agency. You need to know what to fix.\n\nThat's what we built getaproseo.com for.",
+  "If your website was built before 2020 and you've never touched the SEO — you're invisible on Google.\n\nHere's your starting checklist:\n→ Add your location to your homepage title\n→ Create a Google Business Profile\n→ Get 5 customer reviews this month\n\nStart there.",
+  "ChatGPT is changing SEO forever.\n\nWhen someone asks \"who's the best plumber in Sheffield\" — ChatGPT gives a direct answer.\n\nIs your business showing up in those answers?\n\nMost aren't. That's your opportunity.",
+  "The difference between ranking #1 and #10 on Google is usually just this:\n\nThe #1 result answered the question better.\n\nWrite for humans first. Google second. Always.",
+  "We analysed hundreds of small business websites.\n\nThe most common SEO mistake?\n\nTargeting keywords nobody searches for.\n\n\"Bob's Plumbing Sheffield\" gets 0 searches.\n\"Emergency plumber Sheffield\" gets 880/month.\n\nWords matter. Choose the right ones.",
+  "Your Google Business Profile is free.\n\nIt takes 30 minutes to set up.\n\nIt can put you on the first page of Google for local searches tomorrow.\n\nIf you haven't done this yet — stop everything and do it now.",
+  "Schema markup sounds terrifying.\n\nIt isn't.\n\nIt's just a small piece of code that tells Google:\n\"This is a plumbing business. They're in Sheffield. They're open 8am-6pm.\"\n\nGoogle rewards you for it. Almost nobody does it.",
+  "A £7.99 SEO report told one of our users their homepage title was completely wrong.\n\nThey fixed it in 10 minutes.\n\nWithin 6 weeks they were ranking for their main keyword.\n\nSmall things. Big results.",
+  "3 things that kill your Google rankings:\n\n1. Slow mobile load speed\n2. Duplicate content across pages\n3. No inbound links from other websites\n\nAll fixable. None require a developer.",
+  "Unpopular opinion:\n\nMost SEO advice online is written for tech people.\n\nSmall business owners don't need to understand algorithms.\n\nThey need to know: what to fix, in what order, and why it matters.\n\nThat's the gap we built getaproseo.com to fill.",
+  "Your meta description is the 160 characters under your link in Google.\n\nIt doesn't affect your ranking.\n\nBut it determines whether someone clicks your link or your competitor's.\n\nWrite it like an advert. Make it impossible to ignore.",
+  "Here's the honest truth about SEO:\n\nIt's not complicated. It's just time-consuming.\n\nMost small businesses could do 80% of it themselves with the right guidance.\n\nThe other 20% is where agencies make their money.",
+  "Local SEO tip:\n\nAdd your town/city to:\n→ Your homepage H1\n→ Your title tag\n→ Your meta description\n→ Your footer\n→ Your Google Business Profile\n\nDo this today. It costs nothing and works immediately.",
+  "We built an AI that reads your website and produces a plain-English SEO report in 60 seconds.\n\n12 sections. No jargon. Specific to your business.\n\n£7.99 for a one-off report.\n\n→ getaproseo.com",
+  "The businesses ranking #1 on Google aren't smarter than you.\n\nThey just did the basics first.\n\nTitle tags. Google Business Profile. A handful of genuine reviews.\n\nThe basics win. Every time.",
+  "Backlinks explained simply:\n\nEvery time another website links to yours, Google sees it as a vote of confidence.\n\nMore votes = higher ranking.\n\nStart by getting listed on:\n→ Yell.com\n→ Checkatrade\n→ Your local chamber of commerce website\n\nFree. Takes an hour.",
+  "\"But my website looks great.\"\n\nDoesn't matter if Google can't find it.\n\nDesign is for humans. SEO is for Google.\n\nYou need both.",
+  "Mobile-first indexing means Google ranks your mobile site — not your desktop one.\n\nIf your website looks broken on a phone, you're being penalised.\n\nTest it right now: search.google.com/test/mobile-friendly\n\nTakes 30 seconds.",
+  "We launched getaproseo.com to answer one question:\n\n\"Why isn't my website showing up on Google?\"\n\nFor £7.99 you get a full answer. In plain English. In 60 seconds.\n\nNo agency. No jargon. No monthly retainer.\n\nJust answers.",
+  "Content tip that actually works:\n\nWrite one blog post answering the most common question your customers ask you.\n\n\"How much does an emergency callout cost?\"\n\"What's included in a full service?\"\n\"How long does it take?\"\n\nThat's an SEO strategy. Right there.",
+  "AI Search Visibility is the new SEO frontier.\n\nWhen someone asks Google AI or ChatGPT for a recommendation — it pulls from websites it trusts.\n\nTo be recommended by AI, you need:\n→ Clear, structured content\n→ Schema markup\n→ A strong Google Business Profile\n\nMost businesses have none of these.",
+  "The best time to fix your SEO was when you built your website.\n\nThe second best time is today.\n\ngetaproseo.com → 60 second report → plain English → from £7.99",
+  "Why do SEO agencies charge so much?\n\nBecause most business owners don't know what they're paying for.\n\nYou should understand your own SEO. At least the basics.\n\nThen you can make informed decisions about who (if anyone) you hire.",
+  "Quick SEO win for today:\n\nGo to Google and search for your own business name.\n\nWhat comes up?\n\nIf it's not your website in position 1 — you have a problem that needs fixing immediately.",
+  "Most small business websites are invisible on Google.\n\nNot because they're bad businesses.\n\nBecause nobody told them what to fix.\n\nThat's exactly what getaproseo.com does. Plain English. 60 seconds. £7.99.\n\nYour customers are searching. Make sure they find you."
+];
+
+let tweets = [];
+let currentFilter = 'all';
+let expandedIds = new Set();
+
+// PASSWORD
+function checkPassword() {
+  const val = document.getElementById('password-input').value;
+  if (val === PASSWORD) {
+    sessionStorage.setItem('gapseo-auth', '1');
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    init();
+  } else {
+    document.getElementById('lock-error').style.display = 'block';
+    document.getElementById('password-input').value = '';
+    document.getElementById('password-input').focus();
+  }
+}
+
+document.getElementById('password-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
+});
+
+// AUTO-UNLOCK IF SESSION ACTIVE
+if (sessionStorage.getItem('gapseo-auth') === '1') {
+  document.getElementById('lock-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  init();
+}
+
+function init() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) {
+    tweets = JSON.parse(stored);
+  } else {
+    tweets = INITIAL_TWEETS.map((text, i) => ({
+      id: i + 1,
+      text,
+      status: 'queued',
+      created: new Date().toISOString()
+    }));
+    save();
+  }
+  render();
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tweets));
+}
+
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('filter-' + f).classList.add('active');
+  render();
+}
+
+function render() {
+  const total = tweets.length;
+  const queued = tweets.filter(t => t.status === 'queued').length;
+  const posted = tweets.filter(t => t.status === 'posted').length;
+
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-queued').textContent = queued;
+  document.getElementById('stat-posted').textContent = posted;
+  document.getElementById('count-all').textContent = total;
+  document.getElementById('count-queued').textContent = queued;
+  document.getElementById('count-posted').textContent = posted;
+
+  const filtered = tweets.filter(t => currentFilter === 'all' || t.status === currentFilter);
+  const list = document.getElementById('tweets-list');
+  const empty = document.getElementById('empty-state');
+
+  if (filtered.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.innerHTML = filtered.map((tweet, idx) => {
+    const globalIdx = tweets.indexOf(tweet);
+    const isExpanded = expandedIds.has(tweet.id);
+    const needsClamp = tweet.text.length > 200;
+    return `
+      <div class="tweet-card ${tweet.status === 'posted' ? 'posted' : ''}" id="card-${tweet.id}">
+        <div class="tweet-card-header">
+          <span class="tweet-badge ${tweet.status}">${tweet.status === 'posted' ? '✓ Posted' : '#' + (globalIdx + 1) + ' Queued'}</span>
+          <span class="tweet-charcount">${tweet.text.length}/280</span>
+        </div>
+        <div id="view-${tweet.id}">
+          <p class="tweet-text ${needsClamp && !isExpanded ? 'clamped' : ''}" id="text-${tweet.id}">${escHtml(tweet.text)}</p>
+          ${needsClamp ? `<button class="expand-btn" onclick="toggleExpand(${tweet.id})">${isExpanded ? 'Show less ↑' : 'Show more ↓'}</button>` : ''}
+          <div class="tweet-actions">
+            <button class="btn btn-copy" id="copy-${tweet.id}" onclick="copyTweet(${tweet.id})">Copy</button>
+            <button class="btn btn-edit" onclick="startEdit(${tweet.id})">Edit</button>
+            ${tweet.status === 'queued'
+              ? `<button class="btn btn-posted" onclick="markPosted(${tweet.id})">✓ Mark Posted</button>`
+              : `<button class="btn btn-unmark" onclick="markQueued(${tweet.id})">Unmark</button>`
+            }
+            <button class="btn btn-delete" onclick="deleteTweet(${tweet.id})">Delete</button>
+          </div>
+        </div>
+        <div id="edit-${tweet.id}" style="display:none;">
+          <textarea class="edit-area" id="edit-area-${tweet.id}" maxlength="280" oninput="updateCounter(${tweet.id})">${escHtml(tweet.text)}</textarea>
+          <div class="edit-footer">
+            <span class="char-counter" id="counter-${tweet.id}">${tweet.text.length}/280</span>
+            <div class="edit-btns">
+              <button class="btn-cancel" onclick="cancelEdit(${tweet.id})">Cancel</button>
+              <button class="btn-save" onclick="saveEdit(${tweet.id})">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toggleExpand(id) {
+  if (expandedIds.has(id)) expandedIds.delete(id);
+  else expandedIds.add(id);
+  render();
+}
+
+function copyTweet(id) {
+  const tweet = tweets.find(t => t.id === id);
+  if (!tweet) return;
+  navigator.clipboard.writeText(tweet.text);
+  const btn = document.getElementById('copy-' + id);
+  if (btn) { btn.textContent = '✓ Copied!'; btn.classList.add('copied'); }
+  setTimeout(() => { if (btn) { btn.textContent = 'Copy'; btn.classList.remove('copied'); } }, 2000);
+  showToast('Copied to clipboard!');
+}
+
+function markPosted(id) {
+  tweets = tweets.map(t => t.id === id ? { ...t, status: 'posted', postedAt: new Date().toISOString() } : t);
+  save();
+  render();
+  showToast('Marked as posted ✓');
+}
+
+function markQueued(id) {
+  tweets = tweets.map(t => t.id === id ? { ...t, status: 'queued', postedAt: null } : t);
+  save();
+  render();
+}
+
+function deleteTweet(id) {
+  if (!confirm('Delete this tweet?')) return;
+  tweets = tweets.filter(t => t.id !== id);
+  save();
+  render();
+}
+
+function startEdit(id) {
+  document.getElementById('view-' + id).style.display = 'none';
+  document.getElementById('edit-' + id).style.display = 'block';
+  const area = document.getElementById('edit-area-' + id);
+  area.focus();
+  area.setSelectionRange(area.value.length, area.value.length);
+}
+
+function cancelEdit(id) {
+  document.getElementById('view-' + id).style.display = 'block';
+  document.getElementById('edit-' + id).style.display = 'none';
+}
+
+function updateCounter(id) {
+  const area = document.getElementById('edit-area-' + id);
+  const counter = document.getElementById('counter-' + id);
+  const len = area.value.length;
+  counter.textContent = len + '/280';
+  counter.className = 'char-counter' + (len > 270 ? ' over' : len > 250 ? ' warn' : '');
+}
+
+function saveEdit(id) {
+  const area = document.getElementById('edit-area-' + id);
+  const newText = area.value.trim();
+  if (!newText) return;
+  tweets = tweets.map(t => t.id === id ? { ...t, text: newText } : t);
+  save();
+  render();
+  showToast('Tweet updated');
+}
+
+async function generateMore() {
+  const btn = document.getElementById('generate-btn');
+  const spinner = document.getElementById('gen-spinner');
+  const label = document.getElementById('gen-label');
+
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  label.textContent = 'Generating...';
+
+  try {
+    const res = await fetch('/api/generate-tweets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({})
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+
+    const newTweets = data.tweets.map((text, i) => ({
+      id: Date.now() + i,
+      text,
+      status: 'queued',
+      created: new Date().toISOString()
+    }));
+
+    tweets = [...tweets, ...newTweets];
+    save();
+    setFilter('queued');
+    showToast('10 new tweets generated ✦');
+  } catch (e) {
+    showToast('Generation failed — try again');
+  }
+
+  btn.disabled = false;
+  spinner.style.display = 'none';
+  label.textContent = '✦ Generate 10 More';
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
