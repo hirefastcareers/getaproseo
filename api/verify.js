@@ -20,6 +20,8 @@ module.exports = async (req, res) => {
     if (session.payment_status === "paid" || session.status === "complete") {
       res.status(200).json({
         paid: true,
+        plan: session.mode,
+        email: session.customer_details?.email || '',
         url: session.metadata.url,
         context: session.metadata.context,
       });

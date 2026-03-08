@@ -5,14 +5,29 @@
 <link rel="icon" type="image/png" href="/logo-icon.png">
 <meta name="google-site-verification" content="-fKjTFJ3P7R81-oZXEoMuJUZlXvbAg-Z4TyHUsb9R48" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GetAProSEO — Professional SEO Reports for Small Business Owners</title>
-<meta name="description" content="Get a complete, plain-English SEO report for your website in minutes. Find out exactly how to rank higher on Google — no jargon, no agency fees. From just £7.99.">
+<title>GetAProSEO — Plain English SEO Reports for Any Website</title>
+<meta name="description" content="Find out exactly why your website isn't ranking on Google. Plain-English SEO reports for any website, any industry, anywhere. No jargon, no agency. From just £7.99.">
 <meta name="keywords" content="SEO report small business, affordable SEO audit UK, SEO for small business owners, cheap SEO report, AI SEO report, Google ranking report">
-<meta property="og:title" content="GetAProSEO — Professional SEO Reports for Small Business Owners">
-<meta property="og:description" content="Find out exactly why your website isn't ranking on Google — and what to do about it. Plain English. No jargon. From £7.99.">
+<meta property="og:title" content="GetAProSEO — Plain English SEO Reports for Any Website">
+<meta property="og:description" content="Find out exactly why your website isn't ranking on Google. Plain English. No jargon. No agency. From £7.99.">
 <meta property="og:url" content="https://getaproseo.com">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://getaproseo.com">
+<script>
+  // Hide sections immediately if returning from payment
+  if (window.location.search.includes('session_id')) {
+    document.addEventListener('DOMContentLoaded', function() {
+      var hero = document.querySelector('.hero');
+      var features = document.querySelector('.features');
+      var pricing = document.querySelector('.pricing');
+      var footer = document.querySelector('footer');
+      if (hero) hero.style.display = 'none';
+      if (features) features.style.display = 'none';
+      if (pricing) pricing.style.display = 'none';
+      if (footer) footer.style.display = 'none';
+    });
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/duotone/style.css">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -744,7 +759,7 @@ footer a { color: #aaa; text-decoration: none; }
 <!-- HERO -->
 <section class="hero" id="tool">
   <h1 class="animate-fade-up" data-animate-on="load" data-animate-delay="50">Find out exactly why your website<br>isn't ranking on <em>Google</em></h1>
-  <p class="hero-sub animate-fade-up" data-animate-on="load" data-animate-delay="100">Your plain-English SEO report. No jargon. No agency. Results in 60 seconds.</p>
+  <p class="hero-sub animate-fade-up" data-animate-on="load" data-animate-delay="100">Get a complete, plain-English SEO report written for real people — not tech experts. No jargon. No agency fees. Results in under 60 seconds.</p>
 <div class="stats-row" style="display:flex;justify-content:center;gap:48px;margin-bottom:40px;flex-wrap:wrap;">
   <div style="text-align:center;">
     <div class="stats-number" style="font-family:'Playfair Display',serif;font-size:42px;font-weight:900;color:#0d9488;line-height:1;">60s</div>
@@ -774,7 +789,7 @@ footer a { color: #aaa; text-decoration: none; }
       <input class="url-input" id="urlInput" type="url" placeholder="https://yourwebsite.co.uk" />
 
       <div class="field-label">About your business <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#aaa">(optional but improves accuracy)</span></div>
-      <textarea class="context-input" id="contextInput" rows="2" placeholder="e.g. Local plumber in Sheffield covering S1-S35, emergency callouts and boiler installs"></textarea>
+      <textarea class="context-input" id="contextInput" rows="2" placeholder="e.g. Plumber covering emergency callouts and boiler installs"></textarea>
 
       <button class="btn-primary" id="generateBtn" onclick="generateTeaser()">
         ✦ Get My Free SEO Preview
@@ -787,11 +802,15 @@ footer a { color: #aaa; text-decoration: none; }
       </div>
     </div>
 
-    <div id="loading">
-      <div class="spinner"></div>
-      <div class="loading-text" id="loadingText">Analysing your website...</div>
-      <div class="loading-sub">Building your personalised SEO preview</div>
-    </div>
+    <div id="loading" style="display:none;text-align:center;padding:40px 0;">
+  <div style="font-size:32px;margin-bottom:16px;">🔍</div>
+  <div class="loading-text" id="loadingText" style="font-size:16px;font-weight:600;color:#0a0a0a;margin-bottom:8px;">Analysing your website...</div>
+  <div class="loading-sub" style="font-size:13px;color:#aaa;margin-bottom:24px;">This takes around 30–60 seconds — please don't close this tab</div>
+  <div style="background:#f1f3f5;border-radius:999px;height:8px;width:100%;overflow:hidden;">
+    <div id="progressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#0d9488,#2563eb);border-radius:999px;transition:width 0.8s ease;"></div>
+  </div>
+  <div id="progressLabel" style="font-size:12px;color:#aaa;margin-top:8px;">0%</div>
+</div>
 
     <div class="error-box" id="errorBox"></div>
 
@@ -868,6 +887,9 @@ footer a { color: #aaa; text-decoration: none; }
               Unlock Full Report →
             </button>
             <div class="secure-note">🔒 Secure payment via Stripe · Cancel anytime</div>
+            <div style="margin-top:10px;font-size:12px;color:#aaa;">
+              Not sure what you'll get? <a href="/sample.html" target="_blank" style="color:#0d9488;">View a sample report →</a>
+            </div>
           </div>
         </div>
       </div>
@@ -893,8 +915,8 @@ footer a { color: #aaa; text-decoration: none; }
 <section class="features">
   <div class="features-inner">
     <div class="section-label">What you get</div>
-    <h2 class="features-title">Written for business owners,<br>not SEO experts</h2>
-    <p class="features-sub">Every report is tailored to your specific website and business — no generic advice, no confusing jargon.</p>
+    <h2 class="features-title">Written for website owners,<br>not SEO experts</h2>
+    <p class="features-sub">Every report is tailored to your specific website — no generic advice, no confusing jargon, no matter what industry you're in.</p>
 
     <div class="features-grid">
       <div class="feature-card animate-fade-up" data-animate-on="scroll" data-animate-stagger="0">
@@ -934,8 +956,8 @@ footer a { color: #aaa; text-decoration: none; }
 <!-- PRICING -->
 <section class="pricing" id="pricing">
   <div class="section-label">Simple pricing</div>
-  <h2 class="features-title">No subscriptions you'll forget about</h2>
-  <p style="color:var(--mid-grey);font-size:17px;max-width:500px;margin:0 auto">Pay once for a single report, or subscribe for unlimited reports every month.</p>
+  <h2 class="features-title">Simple, honest pricing</h2>
+  <p style="color:var(--mid-grey);font-size:17px;max-width:500px;margin:0 auto">One report or unlimited — no complicated plans, no hidden fees.</p>
 
   <div class="pricing-cards">
     <div class="pricing-card animate-fade-up" data-animate-on="scroll">
@@ -972,7 +994,7 @@ footer a { color: #aaa; text-decoration: none; }
 
 <footer>
   <div class="footer-logo">GetAPro<span>SEO</span></div>
-  <p style="margin-bottom:12px">Professional SEO reports for small business owners</p>
+  <p style="margin-bottom:12px">Plain English SEO reports for any website, anywhere</p>
   <p><a href="mailto:hello@getaproseo.com">hello@getaproseo.com</a> · <a href="/privacy.html">Privacy Policy</a> · <a href="/terms.html">Terms of Service</a></p>
   <p style="margin-top:16px;font-size:11px">© 2026 GetAProSEO. All rights reserved.</p>
 </footer>
@@ -1010,17 +1032,42 @@ const loadingMessages = [
 ];
 
 let loadingInterval;
+let progressInterval;
 
 function startLoadingMessages() {
+  const messages = [
+    'Fetching your website content...',
+    'Analysing your keywords...',
+    'Checking your Google visibility...',
+    'Researching your competitors...',
+    'Building your 90-day action plan...',
+    'Almost there — finalising your report...',
+  ];
   let i = 0;
+  let progress = 0;
+  
   loadingInterval = setInterval(() => {
-    i = (i + 1) % loadingMessages.length;
-    document.getElementById('loadingText').textContent = loadingMessages[i];
-  }, 2500);
+    i = Math.min(i + 1, messages.length - 1);
+    document.getElementById('loadingText').textContent = messages[i];
+  }, 8000);
+
+  progressInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += Math.random() * 3;
+      progress = Math.min(progress, 90);
+      document.getElementById('progressBar').style.width = progress + '%';
+      document.getElementById('progressLabel').textContent = Math.round(progress) + '%';
+    }
+  }, 1500);
 }
 
 function stopLoadingMessages() {
   clearInterval(loadingInterval);
+  clearInterval(progressInterval);
+  const bar = document.getElementById('progressBar');
+  const label = document.getElementById('progressLabel');
+  if (bar) { bar.style.width = '100%'; }
+  if (label) { label.textContent = '100%'; }
 }
 
 async function generateTeaser() {
@@ -1042,11 +1089,25 @@ async function generateTeaser() {
   startLoadingMessages();
 
   try {
-    const res = await fetch('/api/report', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: cleanUrl, context, type: 'teaser' })
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 60000);
+
+    let res;
+    try {
+      res = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: cleanUrl, context, type: 'teaser' }),
+        signal: controller.signal
+      });
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        throw new Error('Preview timed out. Please try again.');
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeout);
+    }
 
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to generate report');
@@ -1174,13 +1235,37 @@ function escHtml(str) {
 }
 
 function resetTool() {
+  // Show all hidden sections
+  document.querySelector('.hero').style.display = '';
+  document.querySelector('.features').style.display = '';
+  document.querySelector('.pricing').style.display = '';
+  document.querySelector('footer').style.display = '';
+
+  // Reset nav button
+  const navCta = document.querySelector('.nav-cta');
+  navCta.textContent = 'Get My SEO Report';
+  navCta.style.background = '';
+  navCta.style.fontSize = '';
+  navCta.href = '#tool';
+  navCta.onclick = null;
+
+  // Hide report
   document.getElementById('full-report').style.display = 'none';
+  document.getElementById('full-report-content').innerHTML = '';
+
+  // Reset tool inputs
   document.getElementById('input-section').style.display = 'block';
   document.getElementById('teaser-section').style.display = 'none';
+  document.getElementById('loading').style.display = 'none';
   document.getElementById('urlInput').value = '';
   document.getElementById('contextInput').value = '';
+
+  // Clean URL
+  window.history.replaceState({}, '', '/');
+
   currentUrl = '';
   currentContext = '';
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -1218,12 +1303,30 @@ async function downloadPDF() {
 
 // Check if returning from successful payment
 window.addEventListener('load', async () => {
+  // Clean URL immediately on load if session already processed
+  const alreadyProcessed = sessionStorage.getItem('processed-' + new URLSearchParams(window.location.search).get('session_id'));
+  if (alreadyProcessed) {
+    window.history.replaceState({}, '', '/');
+    return;
+  }
+
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
   const returnUrl = params.get('url');
   const returnContext = params.get('context');
 
   if (sessionId && returnUrl) {
+    // Hide homepage sections for clean report view
+    document.querySelector('.hero').style.display = 'none';
+    document.querySelector('.features').style.display = 'none';
+    document.querySelector('.pricing').style.display = 'none';
+    document.querySelector('footer').style.display = 'none';
+
+    // Update nav button based on plan
+    const navCta = document.querySelector('.nav-cta');
+    navCta.textContent = 'New Report';
+    navCta.onclick = (e) => { e.preventDefault(); resetTool(); };
+
     // Verify payment and generate full report
     document.getElementById('input-section').style.display = 'none';
     document.getElementById('loading').style.display = 'block';
@@ -1246,21 +1349,77 @@ window.addEventListener('load', async () => {
         throw new Error('Payment not confirmed. Please contact support.');
       }
 
-      // Generate full report
-      const reportRes = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: returnUrl, context: returnContext || '', type: 'full' })
-      });
-
-      const reportData = await reportRes.json();
-      if (!reportRes.ok) throw new Error(reportData.error || 'Failed to generate report');
-
+      // Generate full report with streaming
       stopLoadingMessages();
       document.getElementById('loading').style.display = 'none';
       document.getElementById('reportUrlDisplay').textContent = returnUrl;
-      document.getElementById('full-report-content').innerHTML = renderMarkdown(reportData.report);
       document.getElementById('full-report').style.display = 'block';
+      document.getElementById('full-report-content').innerHTML = '<div id="stream-content"></div>';
+      document.getElementById('full-report').scrollIntoView({ behavior: 'smooth' });
+
+      const streamRes = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: returnUrl,
+          context: returnContext || '',
+          type: 'full',
+          email: verifyData.email || '',
+          session_id: sessionId
+        })
+      });
+
+      if (!streamRes.ok) {
+        const errData = await streamRes.json().catch(() => ({}));
+        throw new Error(errData.error || 'Failed to generate report');
+      }
+
+      const reader = streamRes.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullReport = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.text) {
+                fullReport += data.text;
+                document.getElementById('stream-content').innerHTML = renderMarkdown(fullReport);
+              }
+              if (data.error) throw new Error(data.error);
+            } catch(e) {}
+          }
+        }
+      }
+
+      // Mark this session as processed so it doesn't retrigger
+      sessionStorage.setItem('processed-' + sessionId, '1');
+      window.history.replaceState({}, '', '/');
+
+      // Update nav based on plan type
+      const navCta = document.querySelector('.nav-cta');
+      if (verifyData.plan === 'subscription') {
+        navCta.textContent = 'New Report';
+        navCta.style.background = '#0d9488';
+        navCta.onclick = (e) => { e.preventDefault(); resetTool(); };
+      } else {
+        navCta.textContent = 'Get Unlimited Reports — £19.99/mo';
+        navCta.style.background = '#0d9488';
+        navCta.style.fontSize = '13px';
+        navCta.href = '#';
+        navCta.onclick = (e) => {
+          e.preventDefault();
+          selectPlan('subscription');
+          checkout();
+        };
+      }
 
       // Clean URL
       window.history.replaceState({}, '', '/');
@@ -1307,6 +1466,38 @@ window.addEventListener('load', async () => {
     observer.observe(el);
   });
 })();
+
+// Set localised placeholder based on user country
+async function setLocalisedPlaceholder() {
+  try {
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    const country = data.country_code;
+    const city = data.city || '';
+
+    const placeholders = {
+      GB: `e.g. Plumber covering emergency callouts and boiler installs in ${city || 'the UK'}`,
+      US: `e.g. HVAC contractor serving residential and commercial clients in ${city || 'the US'}`,
+      AU: `e.g. Electrician covering residential rewiring and safety inspections in ${city || 'Australia'}`,
+      CA: `e.g. Landscaping company offering lawn care and snow removal in ${city || 'Canada'}`,
+      IE: `e.g. Accountant serving small businesses and sole traders in ${city || 'Ireland'}`,
+      NZ: `e.g. Builder specialising in new homes and renovations in ${city || 'New Zealand'}`,
+      DE: `e.g. Handwerker für Reparaturen und Renovierungen in ${city || 'Deutschland'}`,
+      FR: `e.g. Plombier intervenant en urgence à ${city || 'France'}`,
+      IT: `e.g. Idraulico per interventi urgenti e manutenzione a ${city || 'Italia'}`,
+      ES: `e.g. Fontanero para urgencias y mantenimiento en ${city || 'España'}`,
+      NL: `e.g. Loodgieter voor spoedreparaties in ${city || 'Nederland'}`,
+      default: `e.g. Plumber covering emergency callouts and boiler installs`
+    };
+
+    const placeholder = placeholders[country] || placeholders.default;
+    document.getElementById('contextInput').placeholder = placeholder;
+  } catch (e) {
+    // Silently fail — default placeholder stays
+  }
+}
+
+setLocalisedPlaceholder();
 </script>
 
 <!-- Schema Markup -->
