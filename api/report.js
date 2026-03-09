@@ -92,7 +92,33 @@ module.exports = async (req, res) => {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { url, context, type, email } = req.body;
-  if (!url) return res.status(400).json({ error: "URL required" });
+  const sessionIdOnly = !url && req.body.session_id && type === 'full';
+  if (!url && !sessionIdOnly) return res.status(400).json({ error: "URL required" });
+
+  // Email link: fetch saved report by session_id only (no url in query)
+  if (sessionIdOnly) {
+    try {
+      const { data } = await supabase
+        .from('reports')
+        .select('url, report_text')
+        .eq('session_id', req.body.session_id)
+        .single();
+      if (!data?.report_text) {
+        return res.status(400).json({ error: "Report not found. The link may have expired or the report is still generating." });
+      }
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.write(`data: ${JSON.stringify({ url: data.url || '' })}\n\n`);
+      res.write(`data: ${JSON.stringify({ text: data.report_text })}\n\n`);
+      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+      res.end();
+      return;
+    } catch (e) {
+      console.error('Supabase fetch by session_id error:', e);
+      return res.status(500).json({ error: "Failed to load report." });
+    }
+  }
 
   // Rate limit free previews
   if (type === 'teaser') {
