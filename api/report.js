@@ -199,7 +199,6 @@ async function fetchPageSpeedData(url) {
   function httpsGet(apiUrl) {
     return new Promise((resolve, reject) => {
       const req = https.get(apiUrl, { timeout: 15000 }, (res) => {
-        // Handle redirects
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           return httpsGet(res.headers.location).then(resolve).catch(reject);
         }
@@ -208,7 +207,6 @@ async function fetchPageSpeedData(url) {
         res.on('end', () => {
           try {
             const parsed = JSON.parse(data);
-            // Check for API error response
             if (parsed.error) {
               console.error('PageSpeed API error:', parsed.error.message);
               reject(new Error(parsed.error.message));
@@ -225,8 +223,9 @@ async function fetchPageSpeedData(url) {
 
   try {
     const encodedUrl = encodeURIComponent(url);
-    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=mobile&category=performance`;
-    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=desktop&category=performance`;
+    const apiKey = process.env.PAGESPEED_API_KEY ? `&key=${process.env.PAGESPEED_API_KEY}` : '';
+    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=mobile&category=performance${apiKey}`;
+    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=desktop&category=performance${apiKey}`;
 
     console.log('Fetching PageSpeed for:', url);
 
@@ -262,7 +261,7 @@ async function fetchPageSpeedData(url) {
       }
     });
 
-    console.log(`PageSpeed success — mobile: ${mobileScore}, desktop: ${desktopScore}`);
+    console.log(`PageSpeed success - mobile: ${mobileScore}, desktop: ${desktopScore}`);
     return { mobileScore, desktopScore, fcp, lcp, tbt, cls, speedIndex, serverResponseTime, usesHttps, hasViewport, opportunities, success: true };
 
   } catch (e) {
