@@ -467,7 +467,7 @@ IMPORTANT INSTRUCTION FOR TECHNICAL SEO SECTION: Do NOT say data is unknown. Do 
   }
 
   // ── System prompt ───────────────────────────────────────────────────────────
-  const systemPrompt = `You are an expert SEO consultant writing plain-English SEO reports for website owners. Your reports are specific, actionable, and written so that a non-technical business owner can understand and act on every recommendation.
+  const systemPrompt = `You are an expert SEO consultant writing concise plain-English SEO reports. Each of the 12 sections must be brief: maximum 150 words and 3-5 action points per section. Prioritise completing ALL 12 sections over detail in any one section — a complete concise report is better than a detailed incomplete one.
 
 Today's date is ${todayDate}. Use this exact date in the report header. Never guess the date.
 
@@ -489,7 +489,7 @@ For the Google Business Profile section: never say status is unknown. Explain wh
 
   const userMessage = isTeaser
     ? `Generate a FREE PREVIEW SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\nGenerate ONLY these 2 sections:\n## SEO Snapshot\n## Keyword Strategy\n\nMake the preview genuinely useful. Do not mention other sections exist.`
-    : `Generate a FULL SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\n${performanceData}\n\n${brokenLinkInfo}\n\n${domainAuthorityInfo}\n\nGenerate ALL 12 sections in full. Do not cut any section short:\n## SEO Snapshot\n## Keyword Strategy\n## On-Page SEO\n## Technical SEO\n## Content Strategy\n## Local SEO & Google Business Profile\n## AI Search Visibility\n## Competitor Analysis\n## Schema Markup\n## Backlink Building\n## Google Search Console\n## 90-Day Action Plan\n\nBe specific to this website. Plain English throughout. Complete every section fully.`;
+    : `Generate a FULL SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\n${performanceData}\n\n${brokenLinkInfo}\n\n${domainAuthorityInfo}\n\nGenerate ALL 12 sections. Keep each section to 150 words maximum and 3-5 action points. Complete all 12 sections — do not run over:\n## SEO Snapshot\n## Keyword Strategy\n## On-Page SEO\n## Technical SEO\n## Content Strategy\n## Local SEO & Google Business Profile\n## AI Search Visibility\n## Competitor Analysis\n## Schema Markup\n## Backlink Building\n## Google Search Console\n## 90-Day Action Plan\n\nBe specific to this website. Plain English. Concise. All 12 sections must be present — prioritise completing the report over adding detail.`;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
