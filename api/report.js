@@ -101,7 +101,7 @@ async function fetchWebsiteContent(url) {
       });
     });
     request.on('error', () => resolve({ success: false }));
-    request.on('timeout', () => { request.destroy(); resolve({ success: false })); });
+    request.on('timeout', () => { request.destroy(); resolve({ success: false }); });
   });
 }
 
