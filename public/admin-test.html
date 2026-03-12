@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>GetAProSEO — Admin Test</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+
+    .card { background: white; border-radius: 16px; padding: 40px; max-width: 680px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+
+    .logo { font-family: Georgia, serif; font-size: 22px; font-weight: 900; color: #0a0a0a; margin-bottom: 8px; }
+    .logo span { color: #0d9488; }
+    .badge { display: inline-block; background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 28px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+    .login-section { display: block; }
+    .main-section { display: none; }
+
+    label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+    input, textarea { width: 100%; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 12px 14px; font-size: 15px; color: #0a0a0a; outline: none; transition: border-color 0.2s; font-family: inherit; }
+    input:focus, textarea:focus { border-color: #0d9488; }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .field { margin-bottom: 20px; }
+
+    .btn { width: 100%; background: #0d9488; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn:hover { background: #0b7c72; }
+    .btn:disabled { background: #99d6d1; cursor: not-allowed; }
+
+    .error { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
+
+    .report-box { margin-top: 32px; display: none; }
+    .report-box h2 { font-size: 16px; color: #444; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+    .report-content { font-size: 15px; line-height: 1.8; color: #1a1a1a; white-space: pre-wrap; }
+    .report-content h2 { font-size: 18px; font-weight: 800; color: #0a0a0a; margin: 28px 0 10px; padding-bottom: 0; border-bottom: none; }
+    .report-content h3 { font-size: 15px; font-weight: 700; color: #0d9488; margin: 18px 0 6px; }
+    .report-content strong { color: #0a0a0a; }
+    .report-content ul { padding-left: 20px; margin: 8px 0; }
+    .report-content li { margin-bottom: 6px; }
+
+    .status { font-size: 13px; color: #0d9488; font-weight: 600; margin-bottom: 12px; display: none; }
+
+    .reset-btn { background: none; border: none; color: #0d9488; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; margin-top: 24px; text-decoration: underline; }
+
+    .scores { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
+    .score-pill { background: #f0fdf9; border: 1.5px solid #0d9488; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #0d9488; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">GetAPro<span>SEO</span></div>
+  <div class="badge">Admin Test Mode</div>
+
+  <!-- Login -->
+  <div class="login-section" id="loginSection">
+    <div class="field">
+      <label for="password">Admin Password</label>
+      <input type="password" id="password" placeholder="Enter password" />
+      <div class="error" id="pwError">Incorrect password. Try again.</div>
+    </div>
+    <button class="btn" onclick="checkPassword()">Enter</button>
+  </div>
+
+  <!-- Main test interface -->
+  <div class="main-section" id="mainSection">
+    <div class="field">
+      <label for="testUrl">Website URL to test</label>
+      <input type="url" id="testUrl" placeholder="https://example.com" />
+    </div>
+    <div class="field">
+      <label for="testContext">Business context (optional)</label>
+      <textarea id="testContext" placeholder="e.g. A recruitment agency targeting UK-based tech companies"></textarea>
+    </div>
+    <button class="btn" id="generateBtn" onclick="generateReport()">Generate Full Report</button>
+
+    <div class="report-box" id="reportBox">
+      <div class="status" id="status">⏳ Generating report...</div>
+      <h2 id="reportTitle"></h2>
+      <div class="report-content" id="reportContent"></div>
+      <button class="reset-btn" onclick="resetForm()">Run another test</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Simple client-side password check
+  const ADMIN_PASSWORD = 'marley';
+
+  function checkPassword() {
+    const val = document.getElementById('password').value;
+    if (val === ADMIN_PASSWORD) {
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('mainSection').style.display = 'block';
+    } else {
+      document.getElementById('pwError').style.display = 'block';
+    }
+  }
+
+  document.getElementById('password')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkPassword();
+  });
+
+  async function generateReport() {
+    const url = document.getElementById('testUrl').value.trim();
+    const context = document.getElementById('testContext').value.trim();
+
+    if (!url) {
+      alert('Please enter a URL to test.');
+      return;
+    }
+
+    const btn = document.getElementById('generateBtn');
+    const reportBox = document.getElementById('reportBox');
+    const reportContent = document.getElementById('reportContent');
+    const reportTitle = document.getElementById('reportTitle');
+    const status = document.getElementById('status');
+
+    btn.disabled = true;
+    btn.textContent = 'Generating...';
+    reportBox.style.display = 'block';
+    status.style.display = 'block';
+    reportContent.textContent = '';
+    reportTitle.textContent = `Report for ${url}`;
+
+    try {
+      const response = await fetch('/api/report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url,
+          context,
+          type: 'full',
+          admin: true,
+          session_id: 'admin-test-' + Date.now()
+        })
+      });
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let fullText = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const json = JSON.parse(line.slice(6));
+              if (json.text) {
+                fullText += json.text;
+                reportContent.innerHTML = formatReport(fullText);
+              }
+              if (json.done) {
+                status.style.display = 'none';
+                btn.disabled = false;
+                btn.textContent = 'Generate Full Report';
+              }
+              if (json.error) {
+                status.textContent = '❌ Error: ' + json.error;
+                btn.disabled = false;
+                btn.textContent = 'Generate Full Report';
+              }
+            } catch (e) {}
+          }
+        }
+      }
+    } catch (err) {
+      status.textContent = '❌ Something went wrong. Check the console.';
+      console.error(err);
+      btn.disabled = false;
+      btn.textContent = 'Generate Full Report';
+    }
+  }
+
+  function formatReport(text) {
+    return text
+      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/^- (.+)$/gm, '<li>$1</li>')
+      .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+      .replace(/\n{2,}/g, '<br><br>')
+      .replace(/\n/g, ' ');
+  }
+
+  function resetForm() {
+    document.getElementById('testUrl').value = '';
+    document.getElementById('testContext').value = '';
+    document.getElementById('reportBox').style.display = 'none';
+    document.getElementById('reportContent').textContent = '';
+    document.getElementById('generateBtn').disabled = false;
+    document.getElementById('generateBtn').textContent = 'Generate Full Report';
+  }
+</script>
+
+</body>
+</html>
