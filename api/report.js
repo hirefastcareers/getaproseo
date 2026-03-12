@@ -198,7 +198,7 @@ async function fetchPageSpeedData(url) {
 
   function httpsGet(apiUrl) {
     return new Promise((resolve, reject) => {
-      const req = https.get(apiUrl, { timeout: 15000 }, (res) => {
+      const req = https.get(apiUrl, { timeout: 25000 }, (res) => {
         if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
           return httpsGet(res.headers.location).then(resolve).catch(reject);
         }
@@ -229,10 +229,14 @@ async function fetchPageSpeedData(url) {
 
     console.log('Fetching PageSpeed for:', url); console.log('API key present:', !!process.env.PAGESPEED_API_KEY, '| Key starts with:', (process.env.PAGESPEED_API_KEY || '').substring(0, 6));
 
-    const [mobileData, desktopData] = await Promise.all([
-      httpsGet(mobileApiUrl),
-      httpsGet(desktopApiUrl)
-    ]);
+    // Fetch mobile first, then desktop — sequential to avoid Vercel timeout
+    let mobileData, desktopData;
+    try {
+      mobileData = await httpsGet(mobileApiUrl);
+    } catch (e) {
+      console.error('Mobile PageSpeed failed:', e.message);
+      return null;
+    }
 
     const categories = mobileData.lighthouseResult?.categories;
     const audits = mobileData.lighthouseResult?.audits;
@@ -243,7 +247,16 @@ async function fetchPageSpeedData(url) {
     }
 
     const mobileScore = Math.round((categories.performance.score || 0) * 100);
-    const desktopScore = Math.round((desktopData.lighthouseResult?.categories?.performance?.score || 0) * 100);
+
+    // Attempt desktop — if it fails, we still have mobile data
+    let desktopScore = null;
+    try {
+      desktopData = await httpsGet(desktopApiUrl);
+      desktopScore = Math.round((desktopData.lighthouseResult?.categories?.performance?.score || 0) * 100);
+    } catch (e) {
+      console.error('Desktop PageSpeed failed (non-critical):', e.message);
+      desktopScore = null;
+    }
     const fcp = audits?.['first-contentful-paint']?.displayValue || null;
     const lcp = audits?.['largest-contentful-paint']?.displayValue || null;
     const tbt = audits?.['total-blocking-time']?.displayValue || null;
@@ -333,7 +346,7 @@ module.exports = async (req, res) => {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { url, context, type, email } = req.body;
+  const { url, context, type, email, browserPageSpeed } = req.body;
   const isAdmin = req.body.admin === true && req.body.admin_password === ADMIN_PASSWORD;
   const sessionIdOnly = !url && req.body.session_id && type === 'full';
   if (!url && !sessionIdOnly) return res.status(400).json({ error: "URL required" });
@@ -389,7 +402,7 @@ module.exports = async (req, res) => {
   // Fetch all data in parallel
   const [siteContent, pageSpeedData, domainAuthority] = await Promise.all([
     fetchWebsiteContent(url),
-    isTeaser ? Promise.resolve(null) : fetchPageSpeedData(url),
+    isTeaser ? Promise.resolve(null) : (browserPageSpeed ? Promise.resolve({ success: true, ...browserPageSpeed }) : fetchPageSpeedData(url)),
     isTeaser ? Promise.resolve(null) : fetchDomainAuthority(url)
   ]);
 
