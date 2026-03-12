@@ -12,7 +12,7 @@ function getTodayDate() {
   return now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-// ─── 1. FETCH WEBSITE CONTENT + META/OG TAGS + BROKEN LINKS ─────────────────
+// ─── 1. FETCH WEBSITE CONTENT + META/OG TAGS + INTERNAL LINKS ────────────────
 async function fetchWebsiteContent(url) {
   const https = require('https');
   const http = require('http');
@@ -31,7 +31,6 @@ async function fetchWebsiteContent(url) {
       response.on('data', (chunk) => { data += chunk; });
       response.on('end', () => {
         try {
-          // Basic fields
           const title = (data.match(/<title[^>]*>([^<]+)<\/title>/i) || [])[1] || '';
           const metaDesc = (data.match(/<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']/) ||
                            data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']description["\']/) || [])[1] || '';
@@ -45,7 +44,7 @@ async function fetchWebsiteContent(url) {
             .trim()
             .slice(0, 2000);
 
-          // ── META & OG TAG ANALYSIS ──────────────────────────────────────────
+          // Meta & OG tags
           const ogTitle = (data.match(/<meta[^>]*property=["\']og:title["\'][^>]*content=["\']([^"\']+)["\']/) ||
                           data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:title["\']/) || [])[1] || '';
           const ogDesc = (data.match(/<meta[^>]*property=["\']og:description["\'][^>]*content=["\']([^"\']+)["\']/) ||
@@ -54,8 +53,6 @@ async function fetchWebsiteContent(url) {
                           data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*property=["\']og:image["\']/) || [])[1] || '';
           const twitterCard = (data.match(/<meta[^>]*name=["\']twitter:card["\'][^>]*content=["\']([^"\']+)["\']/) ||
                                data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']twitter:card["\']/) || [])[1] || '';
-          const twitterTitle = (data.match(/<meta[^>]*name=["\']twitter:title["\'][^>]*content=["\']([^"\']+)["\']/) ||
-                                data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']twitter:title["\']/) || [])[1] || '';
           const canonical = (data.match(/<link[^>]*rel=["\']canonical["\'][^>]*href=["\']([^"\']+)["\']/) ||
                              data.match(/<link[^>]*href=["\']([^"\']+)["\'][^>]*rel=["\']canonical["\']/) || [])[1] || '';
           const robotsMeta = (data.match(/<meta[^>]*name=["\']robots["\'][^>]*content=["\']([^"\']+)["\']/) ||
@@ -63,21 +60,20 @@ async function fetchWebsiteContent(url) {
           const viewport = (data.match(/<meta[^>]*name=["\']viewport["\'][^>]*content=["\']([^"\']+)["\']/) ||
                             data.match(/<meta[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']viewport["\']/) || [])[1] || '';
 
-          // Title length check
+          // Title & meta description length checks
           const titleLength = title.length;
           const titleLengthStatus = titleLength === 0 ? 'Missing' :
-            titleLength < 30 ? `Too short (${titleLength} characters — aim for 50-60)` :
-            titleLength > 60 ? `Too long (${titleLength} characters — aim for 50-60)` :
-            `Good length (${titleLength} characters)`;
+            titleLength < 30 ? `Too short at ${titleLength} characters — aim for 50-60` :
+            titleLength > 60 ? `Too long at ${titleLength} characters — aim for 50-60` :
+            `Good at ${titleLength} characters`;
 
-          // Meta description length check
           const metaDescLength = metaDesc.length;
-          const metaDescStatus = metaDescLength === 0 ? 'Missing — this needs adding' :
-            metaDescLength < 120 ? `Too short (${metaDescLength} characters — aim for 150-160)` :
-            metaDescLength > 160 ? `Too long (${metaDescLength} characters — aim for 150-160)` :
-            `Good length (${metaDescLength} characters)`;
+          const metaDescStatus = metaDescLength === 0 ? 'Missing — this needs adding urgently' :
+            metaDescLength < 120 ? `Too short at ${metaDescLength} characters — aim for 150-160` :
+            metaDescLength > 160 ? `Too long at ${metaDescLength} characters — Google will truncate this` :
+            `Good at ${metaDescLength} characters`;
 
-          // ── INTERNAL LINK EXTRACTION (for broken link check) ───────────────
+          // Internal links for broken link check
           const baseUrlObj = new URL(url);
           const baseOrigin = baseUrlObj.origin;
           const internalLinks = [...new Set(
@@ -91,11 +87,11 @@ async function fetchWebsiteContent(url) {
               })
               .map(href => href.startsWith('/') ? baseOrigin + href : href)
               .filter(href => href.startsWith(baseOrigin))
-          )].slice(0, 15); // Check up to 15 internal links
+          )].slice(0, 15);
 
           resolve({
             title, metaDesc, h1s, h2s, plainText,
-            ogTitle, ogDesc, ogImage, twitterCard, twitterTitle,
+            ogTitle, ogDesc, ogImage, twitterCard,
             canonical, robotsMeta, viewport,
             titleLength, titleLengthStatus, metaDescStatus,
             internalLinks,
@@ -105,15 +101,14 @@ async function fetchWebsiteContent(url) {
       });
     });
     request.on('error', () => resolve({ success: false }));
-    request.on('timeout', () => { request.destroy(); resolve({ success: false }); });
+    request.on('timeout', () => { request.destroy(); resolve({ success: false })); });
   });
 }
 
-// ─── 2. BROKEN LINK CHECKER ──────────────────────────────────────────────────
+// ─── 2. BROKEN LINK CHECKER ───────────────────────────────────────────────────
 async function checkBrokenLinks(links) {
   const https = require('https');
   const http = require('http');
-
   if (!links || links.length === 0) return { broken: [], working: 0, checked: 0 };
 
   async function checkLink(url) {
@@ -130,7 +125,7 @@ async function checkBrokenLinks(links) {
         }, (res) => {
           resolve({ url, status: res.statusCode, broken: res.statusCode === 404 || res.statusCode === 410 });
         });
-        req.on('error', () => resolve({ url, status: 'error', broken: false })); // Network errors — don't flag as broken
+        req.on('error', () => resolve({ url, status: 'error', broken: false }));
         req.on('timeout', () => { req.destroy(); resolve({ url, status: 'timeout', broken: false }); });
         req.end();
       } catch (e) {
@@ -139,7 +134,6 @@ async function checkBrokenLinks(links) {
     });
   }
 
-  // Check links with a concurrency limit of 5 at a time
   const results = [];
   for (let i = 0; i < links.length; i += 5) {
     const batch = links.slice(i, i + 5);
@@ -149,11 +143,10 @@ async function checkBrokenLinks(links) {
 
   const broken = results.filter(r => r.broken).map(r => r.url);
   const working = results.filter(r => !r.broken).length;
-
   return { broken, working, checked: results.length };
 }
 
-// ─── 3. OPEN PAGERANK — FREE DOMAIN AUTHORITY ────────────────────────────────
+// ─── 3. OPEN PAGERANK — FREE DOMAIN AUTHORITY ─────────────────────────────────
 async function fetchDomainAuthority(url) {
   const https = require('https');
   try {
@@ -167,7 +160,7 @@ async function fetchDomainAuthority(url) {
         method: 'POST',
         timeout: 8000,
         headers: {
-          'API-OPR': 'wggswkwoo4g8k04wk8kcwc4cgscocsc0c08ksgck', // Free public API key
+          'API-OPR': 'wggswkwoo4g8k04wk8kcwc4cgscocsc0c08ksgck',
           'Content-Type': 'application/json',
           'Content-Length': Buffer.byteLength(body)
         }
@@ -183,8 +176,7 @@ async function fetchDomainAuthority(url) {
               domain,
               pageRank: result.page_rank_integer ?? null,
               pageRankDecimal: result.page_rank_decimal ?? null,
-              rank: result.rank ?? null,
-              status: result.status_code
+              rank: result.rank ?? null
             });
           } catch (e) { resolve(null); }
         });
@@ -200,33 +192,56 @@ async function fetchDomainAuthority(url) {
   }
 }
 
-// ─── PAGESPEED ────────────────────────────────────────────────────────────────
+// ─── 4. PAGESPEED ─────────────────────────────────────────────────────────────
 async function fetchPageSpeedData(url) {
   const https = require('https');
 
   function httpsGet(apiUrl) {
     return new Promise((resolve, reject) => {
-      const req = https.get(apiUrl, { timeout: 12000 }, (res) => {
+      const req = https.get(apiUrl, { timeout: 15000 }, (res) => {
+        // Handle redirects
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          return httpsGet(res.headers.location).then(resolve).catch(reject);
+        }
         let data = '';
         res.on('data', chunk => { data += chunk; });
         res.on('end', () => {
-          try { resolve(JSON.parse(data)); }
-          catch (e) { reject(new Error('JSON parse failed')); }
+          try {
+            const parsed = JSON.parse(data);
+            // Check for API error response
+            if (parsed.error) {
+              console.error('PageSpeed API error:', parsed.error.message);
+              reject(new Error(parsed.error.message));
+            } else {
+              resolve(parsed);
+            }
+          } catch (e) { reject(new Error('JSON parse failed')); }
         });
       });
-      req.on('error', reject);
-      req.on('timeout', () => { req.destroy(); reject(new Error('Request timed out')); });
+      req.on('error', (e) => { console.error('PageSpeed request error:', e.message); reject(e); });
+      req.on('timeout', () => { req.destroy(); reject(new Error('PageSpeed request timed out')); });
     });
   }
 
   try {
-    const mobileUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile`;
-    const desktopUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=desktop`;
-    const [mobileData, desktopData] = await Promise.all([httpsGet(mobileUrl), httpsGet(desktopUrl)]);
+    const encodedUrl = encodeURIComponent(url);
+    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=mobile&category=performance`;
+    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=desktop&category=performance`;
+
+    console.log('Fetching PageSpeed for:', url);
+
+    const [mobileData, desktopData] = await Promise.all([
+      httpsGet(mobileApiUrl),
+      httpsGet(desktopApiUrl)
+    ]);
 
     const categories = mobileData.lighthouseResult?.categories;
     const audits = mobileData.lighthouseResult?.audits;
-    if (!categories?.performance) return null;
+
+    if (!categories?.performance) {
+      console.error('PageSpeed: no performance category in response');
+      return null;
+    }
 
     const mobileScore = Math.round((categories.performance.score || 0) * 100);
     const desktopScore = Math.round((desktopData.lighthouseResult?.categories?.performance?.score || 0) * 100);
@@ -247,9 +262,11 @@ async function fetchPageSpeedData(url) {
       }
     });
 
+    console.log(`PageSpeed success — mobile: ${mobileScore}, desktop: ${desktopScore}`);
     return { mobileScore, desktopScore, fcp, lcp, tbt, cls, speedIndex, serverResponseTime, usesHttps, hasViewport, opportunities, success: true };
+
   } catch (e) {
-    console.error('PageSpeed fetch error:', e.message);
+    console.error('PageSpeed fetch failed:', e.message);
     return null;
   }
 }
@@ -257,7 +274,7 @@ async function fetchPageSpeedData(url) {
 function scoreRating(score) {
   if (score >= 90) return 'Good';
   if (score >= 50) return 'Needs Improvement';
-  return 'Poor';
+  return 'Poor — this is likely hurting your rankings';
 }
 
 // ─── EMAIL ────────────────────────────────────────────────────────────────────
@@ -370,14 +387,14 @@ module.exports = async (req, res) => {
     } catch (e) { console.error('Supabase fetch error:', e); }
   }
 
-  // ── Fetch all data in parallel ──────────────────────────────────────────────
+  // Fetch all data in parallel
   const [siteContent, pageSpeedData, domainAuthority] = await Promise.all([
     fetchWebsiteContent(url),
     isTeaser ? Promise.resolve(null) : fetchPageSpeedData(url),
     isTeaser ? Promise.resolve(null) : fetchDomainAuthority(url)
   ]);
 
-  // Broken links — only run on full reports, using links extracted from site content
+  // Broken links — sequential after site content
   let brokenLinkData = null;
   if (!isTeaser && siteContent.success && siteContent.internalLinks?.length > 0) {
     brokenLinkData = await checkBrokenLinks(siteContent.internalLinks);
@@ -385,100 +402,95 @@ module.exports = async (req, res) => {
 
   const todayDate = getTodayDate();
 
-  // ── Build data blocks for the prompt ───────────────────────────────────────
+  // ── Build data blocks ───────────────────────────────────────────────────────
   const websiteData = siteContent.success ? `
 ACTUAL WEBSITE DATA (fetched directly — use as primary source of truth):
-- Page Title: ${siteContent.title} — ${siteContent.titleLengthStatus}
-- Meta Description: ${siteContent.metaDesc || 'Not set'} — ${siteContent.metaDescStatus}
-- H1 Headings: ${siteContent.h1s || 'None found'}
+- Page Title: "${siteContent.title}" — ${siteContent.titleLengthStatus}
+- Meta Description: "${siteContent.metaDesc || 'NOT SET'}" — ${siteContent.metaDescStatus}
+- H1 Headings: ${siteContent.h1s || 'NONE FOUND — this is a significant issue'}
 - H2 Headings: ${siteContent.h2s || 'None found'}
 - Canonical Tag: ${siteContent.canonical || 'Not set'}
-- Robots Meta Tag: ${siteContent.robotsMeta || 'Not set'}
-- Viewport Meta Tag: ${siteContent.viewport || 'Not set'}
+- Robots Meta Tag: ${siteContent.robotsMeta || 'Not set — recommend adding "index, follow" explicitly'}
+- Viewport Meta Tag: ${siteContent.viewport || 'Not set — this is a mobile issue'}
 - Page Content Preview: ${siteContent.plainText}
 
-SOCIAL SHARING TAGS (Open Graph & Twitter Cards):
-- OG Title: ${siteContent.ogTitle || 'NOT SET — this is a missing opportunity'}
-- OG Description: ${siteContent.ogDesc || 'NOT SET — this is a missing opportunity'}
-- OG Image: ${siteContent.ogImage || 'NOT SET — pages will show no image when shared on social media'}
+SOCIAL SHARING DATA (Open Graph & Twitter Cards):
+- OG Title: ${siteContent.ogTitle || 'NOT SET'}
+- OG Description: ${siteContent.ogDesc || 'NOT SET'}
+- OG Image: ${siteContent.ogImage || 'NOT SET — pages will show no preview image when shared on Facebook, LinkedIn etc'}
 - Twitter Card: ${siteContent.twitterCard || 'NOT SET'}
-- Twitter Title: ${siteContent.twitterTitle || 'NOT SET'}
 ` : 'Website content could not be fetched — base analysis on the URL and context provided.';
 
   const brokenLinkInfo = brokenLinkData ? `
-BROKEN LINK ANALYSIS (checked ${brokenLinkData.checked} internal links):
-${brokenLinkData.broken.length === 0
-  ? '- No broken links found — all checked internal links are working correctly'
-  : `- BROKEN LINKS FOUND (${brokenLinkData.broken.length}): ${brokenLinkData.broken.join(', ')}`}
-- Working links: ${brokenLinkData.working} of ${brokenLinkData.checked} checked
+BROKEN LINK DATA (checked ${brokenLinkData.checked} internal links):
+- Broken links found: ${brokenLinkData.broken.length === 0 ? 'None — all internal links working correctly' : brokenLinkData.broken.join(', ')}
+- Working links: ${brokenLinkData.working} of ${brokenLinkData.checked}
 ` : '';
 
   const domainAuthorityInfo = domainAuthority ? `
-DOMAIN AUTHORITY (Open PageRank — scale of 0-10):
+DOMAIN AUTHORITY DATA (Open PageRank — must include this in the Backlink Building section):
 - Domain: ${domainAuthority.domain}
-- PageRank Score: ${domainAuthority.pageRank !== null ? `${domainAuthority.pageRank}/10` : 'Not yet indexed'}
-- Global Rank: ${domainAuthority.rank ? `#${domainAuthority.rank.toLocaleString()} globally` : 'Not ranked yet'}
-- What this means: ${
-    domainAuthority.pageRank === null ? 'This domain has very little or no authority yet — building backlinks should be a priority' :
-    domainAuthority.pageRank <= 2 ? 'Low authority — the site is relatively new or has very few quality backlinks' :
-    domainAuthority.pageRank <= 4 ? 'Below average authority — there is clear room to build more backlinks and trust' :
-    domainAuthority.pageRank <= 6 ? 'Average authority — a reasonable foundation but competitors may be stronger' :
-    domainAuthority.pageRank <= 8 ? 'Good authority — this domain has built solid trust with Google' :
-    'Strong authority — this is a well-established, trusted domain'
+- PageRank Score: ${domainAuthority.pageRank !== null ? `${domainAuthority.pageRank}/10` : 'Not yet scored — domain is new or unindexed'}
+- Global Rank: ${domainAuthority.rank ? `#${domainAuthority.rank.toLocaleString()} globally` : 'Not yet globally ranked'}
+- Plain English interpretation: ${
+    domainAuthority.pageRank === null ? 'This domain has no measurable authority yet — it is effectively invisible to Google in competitive searches. Building quality backlinks is the single highest priority action.' :
+    domainAuthority.pageRank <= 2 ? 'Low authority (score ' + domainAuthority.pageRank + '/10). The site exists but has very few quality backlinks. Competitors with higher scores will consistently outrank it.' :
+    domainAuthority.pageRank <= 4 ? 'Below average authority (score ' + domainAuthority.pageRank + '/10). A foundation exists but significant backlink building is needed to compete.' :
+    domainAuthority.pageRank <= 6 ? 'Average authority (score ' + domainAuthority.pageRank + '/10). Reasonable foundation — focused backlink building will push rankings higher.' :
+    domainAuthority.pageRank <= 8 ? 'Good authority (score ' + domainAuthority.pageRank + '/10). Strong domain trust — maintain and build on this.' :
+    'Strong authority (score ' + domainAuthority.pageRank + '/10). Well-established domain with solid Google trust.'
   }
-` : '';
+` : 'Domain authority data unavailable for this report.';
 
   let performanceData = '';
   if (!isTeaser) {
     if (pageSpeedData && pageSpeedData.success) {
       performanceData = `
-REAL PERFORMANCE DATA (from Google PageSpeed Insights — use these exact figures):
-- Mobile Speed Score: ${pageSpeedData.mobileScore}/100 (${scoreRating(pageSpeedData.mobileScore)})
-- Desktop Speed Score: ${pageSpeedData.desktopScore}/100 (${scoreRating(pageSpeedData.desktopScore)})
-- First Contentful Paint: ${pageSpeedData.fcp || 'not available'}
-- Largest Contentful Paint: ${pageSpeedData.lcp || 'not available'}
-- Total Blocking Time: ${pageSpeedData.tbt || 'not available'}
-- Cumulative Layout Shift: ${pageSpeedData.cls || 'not available'}
+REAL PAGESPEED DATA (from Google — use these exact numbers in the Technical SEO section, do not omit them):
+- Mobile Speed Score: ${pageSpeedData.mobileScore}/100 — ${scoreRating(pageSpeedData.mobileScore)}
+- Desktop Speed Score: ${pageSpeedData.desktopScore}/100 — ${scoreRating(pageSpeedData.desktopScore)}
+- First Contentful Paint (time until something first appears): ${pageSpeedData.fcp || 'not available'}
+- Largest Contentful Paint (time until main content loads): ${pageSpeedData.lcp || 'not available'}
+- Total Blocking Time (time page is unresponsive): ${pageSpeedData.tbt || 'not available'}
+- Cumulative Layout Shift (page jumping while loading): ${pageSpeedData.cls || 'not available'}
 - Speed Index: ${pageSpeedData.speedIndex || 'not available'}
 - Server Response Time: ${pageSpeedData.serverResponseTime || 'not available'}
-- HTTPS/SSL: ${pageSpeedData.usesHttps ? 'Yes — site is secure' : 'WARNING: Site is not using HTTPS'}
-- Mobile Viewport Configured: ${pageSpeedData.hasViewport ? 'Yes' : 'No — this needs fixing'}
-${pageSpeedData.opportunities.length > 0 ? `- Performance issues to fix: ${pageSpeedData.opportunities.join(', ')}` : '- No major performance blockers detected'}
+- HTTPS: ${pageSpeedData.usesHttps ? 'Yes — secure' : 'NO — site is not using HTTPS, this must be fixed'}
+- Mobile Viewport: ${pageSpeedData.hasViewport ? 'Configured correctly' : 'NOT configured — mobile users will have a poor experience'}
+- Issues to fix: ${pageSpeedData.opportunities.length > 0 ? pageSpeedData.opportunities.join(', ') : 'No major blockers detected'}
 `;
     } else {
       performanceData = `
-PERFORMANCE DATA: Could not be retrieved for this site at time of report generation.
-IMPORTANT: Do NOT say the data is "unknown" and do NOT tell the user to check another tool. Instead write the Technical SEO section by explaining what each metric means, why it matters, and give clear plain English guidance on how to improve performance for their type of website.
+PAGESPEED DATA: Could not be retrieved for this site.
+IMPORTANT INSTRUCTION FOR TECHNICAL SEO SECTION: Do NOT say data is unknown. Do NOT tell the user to check another tool. Instead, explain what each Core Web Vitals metric means in plain English, why it matters for their specific type of business, what a good score looks like, and give 3-5 specific actionable recommendations they can implement to improve speed. Make it feel complete and useful, not like a placeholder.
 `;
     }
   }
 
-  // ── Prompts ─────────────────────────────────────────────────────────────────
-  const systemPrompt = `You are an expert SEO consultant writing plain-English SEO reports for website owners. Your reports are specific, actionable, and written so anyone can understand them — no technical jargon unless you explain it simply.
+  // ── System prompt ───────────────────────────────────────────────────────────
+  const systemPrompt = `You are an expert SEO consultant writing plain-English SEO reports for website owners. Your reports are specific, actionable, and written so that a non-technical business owner can understand and act on every recommendation.
 
-Today's date is ${todayDate}. Always use this exact date in the report header — never guess or use a different date.
+Today's date is ${todayDate}. Use this exact date in the report header. Never guess the date.
 
-Never use generic advice. Always base your report on the actual website data provided.
+CRITICAL RULES:
+- Never say any data point is "unknown"
+- Never tell the user to go and check another tool
+- Never leave any section incomplete or cut off
+- Never output raw HTML tags in the body of the report — if you need to show a tag value, describe it in plain English
+- Never use code blocks for plain text recommendations like suggested titles or meta descriptions — write them as normal text with quote marks
+- Always use the exact data provided — do not invent or assume figures
+- Write every section fully — the report must feel complete from start to finish
+- UK English spelling throughout (optimisation not optimization, etc.)
 
-When real performance data is provided, use the exact figures — never say metrics are "unknown."
+For the Robots Meta Tag recommendation: describe what it should say in plain English (e.g., 'Add a robots meta tag set to index, follow') — do not show raw HTML code.
 
-When performance data could not be retrieved, still write a full, helpful Technical SEO section — explain what each metric means, why it matters, and what good looks like. Never tell the user to go and check another tool. Never leave any section incomplete.
+For the Domain Authority section: always include the exact PageRank score and global rank from the data provided. Explain what the score means for this specific website in plain English.
 
-For the On-Page SEO section: always reference the exact title tag length, meta description length, canonical tag status, robots meta tag, and viewport tag from the data provided.
-
-For the Social Sharing / OG Tags section: always reference the exact OG and Twitter Card data provided. If tags are missing, explain clearly what they are in plain English, why they matter, and exactly how to add them.
-
-For the Broken Links section: always reference the exact broken link findings provided. If no broken links were found, say so clearly and positively.
-
-For the Domain Authority section: always reference the exact PageRank score provided and explain what it means for this specific website in plain English.
-
-For the Google Business Profile section: never say the status is "unknown." Instead explain what GBP is, why it matters for their type of business, and give step-by-step plain English instructions on how to set it up or check their existing one at google.com/business.
-
-Never include raw HTML tags, XML, or code snippets outside of markdown code blocks.`;
+For the Google Business Profile section: never say status is unknown. Explain what GBP is, why it matters for their type of business, and give clear step-by-step instructions for setting it up or checking their existing profile at google.com/business.`;
 
   const userMessage = isTeaser
-    ? `Generate a FREE PREVIEW SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\nIMPORTANT: Generate ONLY these 2 sections:\n## SEO Snapshot\n## Keyword Strategy\n\nMake the preview genuinely useful but leave the reader wanting more. Do not mention the other sections exist.`
-    : `Generate a FULL SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\n${performanceData}\n\n${brokenLinkInfo}\n\n${domainAuthorityInfo}\n\nGenerate ALL 12 sections:\n## SEO Snapshot\n## Keyword Strategy\n## On-Page SEO\n## Technical SEO\n## Content Strategy\n## Local SEO & Google Business Profile\n## AI Search Visibility\n## Competitor Analysis\n## Schema Markup\n## Backlink Building\n## Google Search Console\n## 90-Day Action Plan\n\nBe highly specific to this website. Write in plain English. Never output raw HTML or XML. Never say any data is "unknown." Never recommend the user go and check another tool.`;
+    ? `Generate a FREE PREVIEW SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\nGenerate ONLY these 2 sections:\n## SEO Snapshot\n## Keyword Strategy\n\nMake the preview genuinely useful. Do not mention other sections exist.`
+    : `Generate a FULL SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\n${performanceData}\n\n${brokenLinkInfo}\n\n${domainAuthorityInfo}\n\nGenerate ALL 12 sections in full. Do not cut any section short:\n## SEO Snapshot\n## Keyword Strategy\n## On-Page SEO\n## Technical SEO\n## Content Strategy\n## Local SEO & Google Business Profile\n## AI Search Visibility\n## Competitor Analysis\n## Schema Markup\n## Backlink Building\n## Google Search Console\n## 90-Day Action Plan\n\nBe specific to this website. Plain English throughout. Complete every section fully.`;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -489,7 +501,7 @@ Never include raw HTML tags, XML, or code snippets outside of markdown code bloc
     try {
       const stream = await client.messages.stream({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 4000,
+        max_tokens: 8000,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }]
       });
