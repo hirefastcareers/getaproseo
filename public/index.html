@@ -1125,7 +1125,7 @@ async function generateFullReport(returnUrl, returnContext, sessionId, verifyDat
   // Wait up to 20s for PageSpeed — if it's ready, include it; if not, proceed without
   const pageSpeedData = await Promise.race([
     pageSpeedPromise,
-    new Promise(resolve => setTimeout(() => resolve(null), 20000))
+    new Promise(resolve => setTimeout(() => resolve(null), 30000))
   ]);
 
   const streamRes = await fetch('/api/report', {

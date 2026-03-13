@@ -2,7 +2,7 @@ const https = require('https');
 
 function httpsGet(url) {
   return new Promise((resolve, reject) => {
-    const req = https.get(url, { timeout: 25000 }, (res) => {
+    const req = https.get(url, { timeout: 28000 }, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
@@ -23,23 +23,22 @@ module.exports = async (req, res) => {
   if (!url) return res.status(400).json({ error: 'Missing url' });
 
   const key = process.env.PAGESPEED_API_KEY ? `&key=${process.env.PAGESPEED_API_KEY}` : '';
-  const base = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}${key}`;
+  const mobileUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&strategy=mobile${key}`;
 
   try {
-    const [mobile, desktop] = await Promise.all([
-      httpsGet(base + '&strategy=mobile'),
-      httpsGet(base + '&strategy=desktop')
-    ]);
+    const mobile = await httpsGet(mobileUrl);
 
     if (!mobile?.lighthouseResult?.categories?.performance) {
       return res.status(200).json({ success: false, error: 'No performance data' });
     }
 
     const lhr = mobile.lighthouseResult;
+    const mobileScore = Math.round((lhr.categories.performance.score || 0) * 100);
+
     res.status(200).json({
       success: true,
-      mobileScore: Math.round((lhr.categories.performance.score || 0) * 100),
-      desktopScore: desktop?.lighthouseResult ? Math.round((desktop.lighthouseResult.categories.performance.score || 0) * 100) : null,
+      mobileScore,
+      desktopScore: null,
       fcp: lhr.audits['first-contentful-paint']?.displayValue || null,
       lcp: lhr.audits['largest-contentful-paint']?.displayValue || null,
       tbt: lhr.audits['total-blocking-time']?.displayValue || null,
