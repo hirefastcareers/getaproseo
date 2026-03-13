@@ -199,6 +199,76 @@ function scoreRating(score) {
   return 'Poor — this is likely hurting your rankings';
 }
 
+async function fetchPageSpeedData(url) {
+  const https = require('https');
+
+  function httpsGet(apiUrl) {
+    return new Promise((resolve, reject) => {
+      const req = https.get(apiUrl, { timeout: 55000 }, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          return httpsGet(res.headers.location).then(resolve).catch(reject);
+        }
+        let data = '';
+        res.on('data', chunk => { data += chunk; });
+        res.on('end', () => {
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.error) { reject(new Error(parsed.error.message)); }
+            else { resolve(parsed); }
+          } catch (e) { reject(new Error('JSON parse failed')); }
+        });
+      });
+      req.on('error', reject);
+      req.on('timeout', () => { req.destroy(); reject(new Error('PageSpeed request timed out')); });
+    });
+  }
+
+  try {
+    const encodedUrl = encodeURIComponent(url);
+    const apiKey = process.env.PAGESPEED_API_KEY ? `&key=${process.env.PAGESPEED_API_KEY}` : '';
+    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=mobile&category=performance${apiKey}`;
+    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=desktop&category=performance${apiKey}`;
+
+    console.log('Fetching PageSpeed for:', url);
+
+    const [mobileData, desktopData] = await Promise.all([
+      httpsGet(mobileApiUrl),
+      httpsGet(desktopApiUrl).catch(() => null)
+    ]);
+
+    const categories = mobileData.lighthouseResult?.categories;
+    const audits = mobileData.lighthouseResult?.audits;
+    if (!categories?.performance) return null;
+
+    const mobileScore = Math.round((categories.performance.score || 0) * 100);
+    const desktopScore = desktopData?.lighthouseResult
+      ? Math.round((desktopData.lighthouseResult.categories.performance.score || 0) * 100)
+      : null;
+
+    const fcp = audits?.['first-contentful-paint']?.displayValue || null;
+    const lcp = audits?.['largest-contentful-paint']?.displayValue || null;
+    const tbt = audits?.['total-blocking-time']?.displayValue || null;
+    const cls = audits?.['cumulative-layout-shift']?.displayValue || null;
+    const speedIndex = audits?.['speed-index']?.displayValue || null;
+    const serverResponseTime = audits?.['server-response-time']?.displayValue || null;
+    const usesHttps = audits?.['is-on-https']?.score === 1;
+    const hasViewport = audits?.['viewport']?.score === 1;
+
+    const oppAudits = ['render-blocking-resources','unused-css-rules','unused-javascript','uses-optimized-images','uses-text-compression'];
+    const opportunities = oppAudits
+      .filter(k => audits?.[k] && audits[k].score !== null && audits[k].score < 0.9)
+      .map(k => audits[k].title);
+
+    console.log(`PageSpeed success - mobile: ${mobileScore}, desktop: ${desktopScore}`);
+    return { success: true, mobileScore, desktopScore, fcp, lcp, tbt, cls, speedIndex, serverResponseTime, usesHttps, hasViewport, opportunities };
+
+  } catch (e) {
+    console.error('PageSpeed fetch failed:', e.message);
+    return null;
+  }
+}
+
+
 // ─── EMAIL ────────────────────────────────────────────────────────────────────
 async function sendEmail(fullText, url, email, sessionId) {
   if (!email || !process.env.RESEND_API_KEY) return;
@@ -312,7 +382,7 @@ module.exports = async (req, res) => {
   // Fetch all data in parallel
   const [siteContent, pageSpeedData, domainAuthority] = await Promise.all([
     fetchWebsiteContent(url),
-    isTeaser ? Promise.resolve(null) : Promise.resolve(browserPageSpeed ? { success: true, ...browserPageSpeed } : null),
+    isTeaser ? Promise.resolve(null) : fetchPageSpeedData(url),
     isTeaser ? Promise.resolve(null) : fetchDomainAuthority(url)
   ]);
 
@@ -423,7 +493,7 @@ For the Google Business Profile section: never say status is unknown. Explain wh
     try {
       const stream = await client.messages.stream({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 8000,
+        max_tokens: 10000,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }]
       });

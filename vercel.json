@@ -1,34 +1,10 @@
 {
-  "version": 2,
   "functions": {
     "api/report.js": {
+      "maxDuration": 300
+    },
+    "api/pagespeed.js": {
       "maxDuration": 60
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/"
-    },
-    {
-      "source": "/tweets",
-      "destination": "/public/tweets.html"
-    },
-    {
-      "source": "/privacy",
-      "destination": "/public/privacy.html"
-    },
-    {
-      "source": "/terms",
-      "destination": "/public/terms.html"
-    },
-    {
-      "source": "/success",
-      "destination": "/public/success.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/public/"
-    }
-  ]
+  }
 }
