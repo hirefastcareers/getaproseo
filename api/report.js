@@ -513,7 +513,7 @@ For the Google Business Profile section: never say status is unknown. Explain wh
     try {
       const stream = await client.messages.stream({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 10000,
+        max_tokens: 12000,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }]
       });
