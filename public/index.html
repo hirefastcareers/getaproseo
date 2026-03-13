@@ -1112,8 +1112,21 @@ async function checkout() {
 }
 
 async function generateFullReport(returnUrl, returnContext, sessionId, verifyData) {
-  // Fire PageSpeed fetch in background — don't block report generation
-  const pageSpeedPromise = fetchPageSpeedViaBrowser(returnUrl);
+  // Fetch PageSpeed with hard 25s cap before report starts
+  document.getElementById('loadingText').textContent = 'Checking your page speed...';
+  let pageSpeedData = null;
+  try {
+    const psRes = await fetch('/api/pagespeed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: returnUrl }),
+      signal: AbortSignal.timeout(25000)
+    });
+    const psJson = await psRes.json();
+    if (psJson.success) pageSpeedData = psJson;
+  } catch (e) {
+    // PageSpeed timed out or failed — continue without it
+  }
 
   stopLoadingMessages();
   document.getElementById('loading').style.display = 'none';
@@ -1121,12 +1134,6 @@ async function generateFullReport(returnUrl, returnContext, sessionId, verifyDat
   document.getElementById('full-report').style.display = 'block';
   document.getElementById('full-report-content').innerHTML = '<div id="stream-content"></div>';
   document.getElementById('full-report').scrollIntoView({ behavior: 'smooth' });
-
-  // Wait up to 20s for PageSpeed — if it's ready, include it; if not, proceed without
-  const pageSpeedData = await Promise.race([
-    pageSpeedPromise,
-    new Promise(resolve => setTimeout(() => resolve(null), 30000))
-  ]);
 
   const streamRes = await fetch('/api/report', {
     method: 'POST',

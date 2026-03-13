@@ -193,96 +193,6 @@ async function fetchDomainAuthority(url) {
 }
 
 // ─── 4. PAGESPEED ─────────────────────────────────────────────────────────────
-async function fetchPageSpeedData(url) {
-  const https = require('https');
-
-  function httpsGet(apiUrl) {
-    return new Promise((resolve, reject) => {
-      const req = https.get(apiUrl, { timeout: 25000 }, (res) => {
-        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-          return httpsGet(res.headers.location).then(resolve).catch(reject);
-        }
-        let data = '';
-        res.on('data', chunk => { data += chunk; });
-        res.on('end', () => {
-          try {
-            const parsed = JSON.parse(data);
-            if (parsed.error) {
-              console.error('PageSpeed API error:', parsed.error.message);
-              reject(new Error(parsed.error.message));
-            } else {
-              resolve(parsed);
-            }
-          } catch (e) { reject(new Error('JSON parse failed')); }
-        });
-      });
-      req.on('error', (e) => { console.error('PageSpeed request error:', e.message); reject(e); });
-      req.on('timeout', () => { req.destroy(); reject(new Error('PageSpeed request timed out')); });
-    });
-  }
-
-  try {
-    const encodedUrl = encodeURIComponent(url);
-    const apiKey = process.env.PAGESPEED_API_KEY ? `&key=${process.env.PAGESPEED_API_KEY}` : '';
-    const mobileApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=mobile&category=performance${apiKey}`;
-    const desktopApiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodedUrl}&strategy=desktop&category=performance${apiKey}`;
-
-    console.log('Fetching PageSpeed for:', url); console.log('API key present:', !!process.env.PAGESPEED_API_KEY, '| Key starts with:', (process.env.PAGESPEED_API_KEY || '').substring(0, 6));
-
-    // Fetch mobile first, then desktop — sequential to avoid Vercel timeout
-    let mobileData, desktopData;
-    try {
-      mobileData = await httpsGet(mobileApiUrl);
-    } catch (e) {
-      console.error('Mobile PageSpeed failed:', e.message);
-      return null;
-    }
-
-    const categories = mobileData.lighthouseResult?.categories;
-    const audits = mobileData.lighthouseResult?.audits;
-
-    if (!categories?.performance) {
-      console.error('PageSpeed: no performance category in response');
-      return null;
-    }
-
-    const mobileScore = Math.round((categories.performance.score || 0) * 100);
-
-    // Attempt desktop — if it fails, we still have mobile data
-    let desktopScore = null;
-    try {
-      desktopData = await httpsGet(desktopApiUrl);
-      desktopScore = Math.round((desktopData.lighthouseResult?.categories?.performance?.score || 0) * 100);
-    } catch (e) {
-      console.error('Desktop PageSpeed failed (non-critical):', e.message);
-      desktopScore = null;
-    }
-    const fcp = audits?.['first-contentful-paint']?.displayValue || null;
-    const lcp = audits?.['largest-contentful-paint']?.displayValue || null;
-    const tbt = audits?.['total-blocking-time']?.displayValue || null;
-    const cls = audits?.['cumulative-layout-shift']?.displayValue || null;
-    const speedIndex = audits?.['speed-index']?.displayValue || null;
-    const serverResponseTime = audits?.['server-response-time']?.displayValue || null;
-    const usesHttps = audits?.['is-on-https']?.score === 1;
-    const hasViewport = audits?.['viewport']?.score === 1;
-
-    const opportunities = [];
-    const oppAudits = ['render-blocking-resources', 'unused-css-rules', 'unused-javascript', 'uses-optimized-images', 'uses-text-compression'];
-    oppAudits.forEach(key => {
-      if (audits?.[key] && audits[key].score !== null && audits[key].score < 0.9) {
-        opportunities.push(audits[key].title);
-      }
-    });
-
-    console.log(`PageSpeed success - mobile: ${mobileScore}, desktop: ${desktopScore}`);
-    return { mobileScore, desktopScore, fcp, lcp, tbt, cls, speedIndex, serverResponseTime, usesHttps, hasViewport, opportunities, success: true };
-
-  } catch (e) {
-    console.error('PageSpeed fetch failed:', e.message);
-    return null;
-  }
-}
-
 function scoreRating(score) {
   if (score >= 90) return 'Good';
   if (score >= 50) return 'Needs Improvement';
@@ -402,7 +312,7 @@ module.exports = async (req, res) => {
   // Fetch all data in parallel
   const [siteContent, pageSpeedData, domainAuthority] = await Promise.all([
     fetchWebsiteContent(url),
-    isTeaser ? Promise.resolve(null) : (browserPageSpeed ? Promise.resolve({ success: true, ...browserPageSpeed }) : fetchPageSpeedData(url)),
+    isTeaser ? Promise.resolve(null) : Promise.resolve(browserPageSpeed ? { success: true, ...browserPageSpeed } : null),
     isTeaser ? Promise.resolve(null) : fetchDomainAuthority(url)
   ]);
 
