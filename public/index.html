@@ -957,6 +957,7 @@ footer a { color: #aaa; text-decoration: none; }
 let selectedPlan = 'subscription';
 let currentUrl = '';
 let currentContext = '';
+let currentPageSpeed = null; // Pre-fetched during teaser phase
 
 function selectPlan(plan) {
   selectedPlan = plan;
@@ -1019,18 +1020,23 @@ function stopLoadingMessages() {
 }
 
 // Fetch PageSpeed from browser — bypasses Vercel network restrictions
-async function fetchPageSpeedViaBrowser(url) {
+// Fetches PageSpeed in background and stores in currentPageSpeed global
+// Called as soon as teaser starts — PageSpeed is ready long before user pays
+async function fetchPageSpeedInBackground(url) {
   try {
     const res = await fetch('/api/pagespeed', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url }),
-      signal: AbortSignal.timeout(30000)
+      signal: AbortSignal.timeout(45000)
     });
     const data = await res.json();
-    return data.success ? data : null;
+    if (data.success) {
+      currentPageSpeed = data;
+      console.log('PageSpeed pre-fetched:', data.mobileScore);
+    }
   } catch (e) {
-    return null;
+    console.log('PageSpeed pre-fetch failed silently:', e.message);
   }
 }
 
@@ -1045,6 +1051,10 @@ async function generateTeaser() {
   hideError();
   currentUrl = cleanUrl;
   currentContext = context;
+  currentPageSpeed = null; // Reset for new URL
+
+  // Start PageSpeed fetch immediately in background — will be ready by the time user pays
+  fetchPageSpeedInBackground(cleanUrl);
 
   document.getElementById('input-section').style.display = 'none';
   document.getElementById('teaser-section').style.display = 'none';
@@ -1112,21 +1122,13 @@ async function checkout() {
 }
 
 async function generateFullReport(returnUrl, returnContext, sessionId, verifyData) {
-  // Fetch PageSpeed with hard 25s cap before report starts
-  document.getElementById('loadingText').textContent = 'Checking your page speed...';
-  let pageSpeedData = null;
-  try {
-    const psRes = await fetch('/api/pagespeed', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: returnUrl }),
-      signal: AbortSignal.timeout(25000)
-    });
-    const psJson = await psRes.json();
-    if (psJson.success) pageSpeedData = psJson;
-  } catch (e) {
-    // PageSpeed timed out or failed — continue without it
+  // Use pre-fetched PageSpeed data (fetched during teaser phase)
+  // If not ready yet, wait up to 15s — it's had plenty of time by now
+  if (!currentPageSpeed) {
+    document.getElementById('loadingText').textContent = 'Finalising your speed data...';
+    await new Promise(resolve => setTimeout(resolve, 15000));
   }
+  const pageSpeedData = currentPageSpeed;
 
   stopLoadingMessages();
   document.getElementById('loading').style.display = 'none';
