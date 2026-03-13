@@ -502,7 +502,7 @@ For the Google Business Profile section: never say status is unknown. Explain wh
 
   const userMessage = isTeaser
     ? `Generate a FREE PREVIEW SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\nGenerate ONLY these 2 sections:\n## SEO Snapshot\n## Keyword Strategy\n\nMake the preview genuinely useful. Do not mention other sections exist.`
-    : `Generate a FULL SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\n${performanceData}\n\n${brokenLinkInfo}\n\n${domainAuthorityInfo}\n\nGenerate ALL 12 sections. Rules: max 120 words per section, max 5 bullet points per section, no long paragraphs. The 90-Day Action Plan must be the shortest section — a simple week-by-week list only, no explanations. Complete all 12 sections — finishing the report is the top priority:\n## SEO Snapshot\n## Keyword Strategy\n## On-Page SEO\n## Technical SEO\n## Content Strategy\n## Local SEO & Google Business Profile\n## AI Search Visibility\n## Competitor Analysis\n## Schema Markup\n## Backlink Building\n## Google Search Console\n## 90-Day Action Plan\n\nBe specific to this website. Plain English. Concise. All 12 sections must be present — prioritise completing the report over adding detail.`;
+    : `Generate a FULL SEO report for: ${url}\n${context ? `Business context: ${context}` : ''}\n\n${websiteData}\n\n${performanceData}\n\n${brokenLinkInfo}\n\n${domainAuthorityInfo}\n\nGenerate ALL 12 sections. Rules: max 120 words per section, max 5 bullet points per section, no long paragraphs. The 90-Day Action Plan must be the shortest section — a simple week-by-week list only, no explanations. Complete all 12 sections — finishing the report is the top priority:\n## SEO Snapshot\n## Keyword Strategy\n## On-Page SEO\n## Technical SEO\n## Content Strategy\n## Local SEO & Google Business Profile\n## AI Search Visibility\n## Competitor Analysis\n## Schema Markup\n## Backlink Building\n## Google Search Console\n## 90-Day Action Plan\n\nBe specific to this website. Plain English. Every section must be short and punchy. Complete all 12 sections — finish the report.`;
 
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
@@ -513,7 +513,7 @@ For the Google Business Profile section: never say status is unknown. Explain wh
     try {
       const stream = await client.messages.stream({
         model: "claude-haiku-4-5-20251001",
-        max_tokens: 12000,
+        max_tokens: 8500,
         system: systemPrompt,
         messages: [{ role: "user", content: userMessage }]
       });
