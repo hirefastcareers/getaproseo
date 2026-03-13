@@ -827,12 +827,12 @@ footer a { color: #aaa; text-decoration: none; }
             </div>
 
             <div class="price-options">
-              <div class="price-option" id="opt-onetime" onclick="selectPlan('onetime')">
+              <div class="price-option selected" id="opt-onetime" onclick="selectPlan('onetime')">
                 <div class="price-option-label">One Report</div>
                 <div class="price-option-price">£7.99</div>
                 <div class="price-option-sub">One-off payment</div>
               </div>
-              <div class="price-option selected" id="opt-subscription" onclick="selectPlan('subscription')">
+              <div class="price-option" id="opt-subscription" onclick="selectPlan('subscription')">
                 <div class="popular-badge">BEST VALUE</div>
                 <div class="price-option-label">Unlimited</div>
                 <div class="price-option-price">£19.99</div>
@@ -954,7 +954,7 @@ footer a { color: #aaa; text-decoration: none; }
 </footer>
 
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-let selectedPlan = 'subscription';
+let selectedPlan = 'onetime';
 let currentUrl = '';
 let currentContext = '';
 let currentPageSpeed = null; // Pre-fetched during teaser phase
