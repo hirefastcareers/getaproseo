@@ -949,11 +949,11 @@ footer a { color: #aaa; text-decoration: none; }
 <footer>
   <div class="footer-logo">GetAPro<span>SEO</span></div>
   <p style="margin-bottom:12px">Plain English SEO reports for any website, anywhere</p>
-  <p><a href="mailto:hello@getaproseo.com">hello@getaproseo.com</a> · <a href="/privacy.html">Privacy Policy</a> · <a href="/terms.html">Terms of Service</a></p>
+  <p><a href="/cdn-cgi/l/email-protection#e28a878e8e8da28587968392908d91878dcc818d8f"><span class="__cf_email__" data-cfemail="48202d242427082f2d3c29383a273b2d27662b2725">[email&#160;protected]</span></a> · <a href="/privacy.html">Privacy Policy</a> · <a href="/terms.html">Terms of Service</a></p>
   <p style="margin-top:16px;font-size:11px">© 2026 GetAProSEO. All rights reserved.</p>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 let selectedPlan = 'subscription';
 let currentUrl = '';
 let currentContext = '';
@@ -1112,9 +1112,8 @@ async function checkout() {
 }
 
 async function generateFullReport(returnUrl, returnContext, sessionId, verifyData) {
-  // Fetch PageSpeed from browser in parallel with setting up the UI
-  document.getElementById('loadingText').textContent = 'Checking your page speed...';
-  const pageSpeedData = await fetchPageSpeedViaBrowser(returnUrl);
+  // Fire PageSpeed fetch in background — don't block report generation
+  const pageSpeedPromise = fetchPageSpeedViaBrowser(returnUrl);
 
   stopLoadingMessages();
   document.getElementById('loading').style.display = 'none';
@@ -1122,6 +1121,12 @@ async function generateFullReport(returnUrl, returnContext, sessionId, verifyDat
   document.getElementById('full-report').style.display = 'block';
   document.getElementById('full-report-content').innerHTML = '<div id="stream-content"></div>';
   document.getElementById('full-report').scrollIntoView({ behavior: 'smooth' });
+
+  // Wait up to 20s for PageSpeed — if it's ready, include it; if not, proceed without
+  const pageSpeedData = await Promise.race([
+    pageSpeedPromise,
+    new Promise(resolve => setTimeout(() => resolve(null), 20000))
+  ]);
 
   const streamRes = await fetch('/api/report', {
     method: 'POST',
@@ -1524,18 +1529,4 @@ setLocalisedPlaceholder();
       "priceCurrency": "GBP"
     },
     {
-      "@type": "Offer",
-      "name": "Monthly Unlimited",
-      "price": "19.99",
-      "priceCurrency": "GBP",
-      "priceSpecification": {
-        "@type": "UnitPriceSpecification",
-        "billingDuration": "P1M"
-      }
-    }
-  ]
-}
-</script>
-
-</body>
-</html>
+      "@type": "Offer
