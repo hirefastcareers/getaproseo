@@ -12,6 +12,34 @@ function getTodayDate() {
   return now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
+// --- SSRF PROTECTION ---
+function validateUrl(url) {
+  try {
+    const parsed = new URL(url);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return { valid: false, reason: 'Invalid protocol' };
+    }
+    const hostname = parsed.hostname.toLowerCase();
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1') {
+      return { valid: false, reason: 'Loopback address not allowed' };
+    }
+    if (hostname === '169.254.169.254' || hostname === 'metadata.google.internal') {
+      return { valid: false, reason: 'Metadata endpoint not allowed' };
+    }
+    const privateRanges = [
+      /^10\./, /^172\.(1[6-9]|2[0-9]|3[01])\./, /^192\.168\./,
+      /^169\.254\./, /^fd[0-9a-f]{2}:/i
+    ];
+    if (privateRanges.some(r => r.test(hostname))) {
+      return { valid: false, reason: 'Private IP range not allowed' };
+    }
+    return { valid: true };
+  } catch (e) {
+    return { valid: false, reason: 'Invalid URL' };
+  }
+}
+
+
 // ─── 1. FETCH WEBSITE CONTENT + META/OG TAGS + INTERNAL LINKS ────────────────
 async function fetchWebsiteContent(url) {
   const https = require('https');
@@ -320,7 +348,7 @@ const ADMIN_PASSWORD = 'marley';
 
 // ─── MAIN HANDLER ─────────────────────────────────────────────────────────────
 module.exports = async (req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Origin", "https://getaproseo.com");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -330,6 +358,14 @@ module.exports = async (req, res) => {
   const isAdmin = req.body.admin === true && req.body.admin_password === ADMIN_PASSWORD;
   const sessionIdOnly = !url && req.body.session_id && type === 'full';
   if (!url && !sessionIdOnly) return res.status(400).json({ error: "URL required" });
+
+  // SSRF protection — validate URL before any outbound fetch
+  if (url) {
+    const urlCheck = validateUrl(url);
+    if (!urlCheck.valid) {
+      return res.status(400).json({ error: "Invalid URL provided." });
+    }
+  }
 
   // Email link: fetch saved report by session_id only
   if (sessionIdOnly) {
