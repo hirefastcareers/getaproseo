@@ -155,6 +155,10 @@ const SEC_META = {
 function getBadge(title, body, allLines) {
   const t = title.toLowerCase(), b = (body||'').toLowerCase();
   const lines = (allLines || []).join(' ').toLowerCase();
+  if (t.includes('on-page')) return {text:'Critical',cls:'badge-critical'};
+  if (t.includes('local seo')) return {text:'Action needed',cls:'badge-critical'};
+  if (t.includes('schema')) return {text:'Not installed',cls:'badge-critical'};
+  if (t.includes('search console')) return {text:'Action needed',cls:'badge-warn'};
   if (t.includes('on-page')) {
     if (/h1|meta description|title\s+(issue|missing|problem)/i.test(lines)) return {text:'Critical',cls:'badge-critical'};
   }
@@ -249,7 +253,7 @@ function renderMarkdown(md) {
 function injectHealthSummary(md) {
   const mobileMatch=md.match(/mobile[^\n]*?(\d{1,3})\s*\/\s*100/i);
   const desktopMatch=md.match(/desktop[^\n]*?(\d{1,3})\s*\/\s*100/i);
-  const daMatch = md.match(/pagerank[\s\S]{0,60}?(\d{1,2})\s*\/\s*10/i) || md.match(/domain authority[^\n]*(\d{1,2})\s*\/\s*10/i) || md.match(/(\d{1,2})\s*\/\s*10[^\n]*authority/i);
+  const daMatch = md.match(/PageRank Score[^\n]*?(\d{1,2})\s*\/\s*10/i) || md.match(/pagerank[^\n]*?(\d{1,2})\s*\/\s*10/i) || md.match(/(\d{1,2})\/10[^\n]*(authority|pagerank|rank)/i);
   const noBroken=!md.match(/broken links found[^\n]*(?!none)/i)||!!md.match(/broken[^\n]*none/i);
   const httpsNo=md.match(/https[^\n]*(not|no\s|missing)/i);
   const mobile=mobileMatch?parseInt(mobileMatch[1]):null;
