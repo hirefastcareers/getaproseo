@@ -1267,7 +1267,7 @@ async function generateFullReport(returnUrl, returnContext, sessionId, verifyDat
 function injectHealthSummary(md, url) {
   const mobileMatch = md.match(/mobile[^\n]*?(\d{1,3})\s*\/\s*100/i);
   const desktopMatch = md.match(/desktop[^\n]*?(\d{1,3})\s*\/\s*100/i);
-  const daMatch = md.match(/PageRank Score[^\n]*?(\d{1,2})\s*\/\s*10/i) || md.match(/pagerank[^\n]*?(\d{1,2})\s*\/\s*10/i) || md.match(/(\d{1,2})\/10[^\n]*(authority|pagerank|rank)/i);
+  const daMatch = md.match(/PageRank Score:\s*(\d{1,2})\/10/i) || md.match(/pagerank[^\n]{0,20}?:\s*(\d{1,2})\/10/i);
   const noBroken = !md.match(/broken links found[^\n]*(?!none)/i) || !!md.match(/broken[^\n]*none/i);
   const httpsNo = md.match(/https[^\n]*(not|no\s|missing)/i);
 
