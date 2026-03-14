@@ -289,47 +289,128 @@ nav {
 .teaser-header h3 { font-size: 16px; font-weight: 700; color: var(--accent-dark); margin-bottom: 4px; }
 .teaser-header p { font-size: 13px; color: var(--accent); }
 
+/* ── Report health header ── */
+.rpt-health-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.rpt-health-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 12px;
+  text-align: center;
+}
+.rpt-health-label { font-size: 11px; color: #64748b; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.rpt-health-score { font-size: 28px; font-weight: 800; line-height: 1; }
+.rpt-health-sub { font-size: 11px; margin-top: 4px; font-weight: 600; }
+.rpt-gauge { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.rpt-gauge-fill { height: 100%; border-radius: 2px; }
+.score-good { color: #0d9488; }
+.score-warn { color: #d97706; }
+.score-bad { color: #dc2626; }
+/* ── Section cards ── */
 .report-section {
-  background: var(--white);
-  border: 1.5px solid var(--border);
+  background: #fff;
+  border: 1px solid #e2e8f0;
   border-radius: 14px;
-  padding: 28px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
 }
-
-.section-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--black);
-  margin-bottom: 16px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--accent-light);
+.report-section:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.sec-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  gap: 12px;
 }
-
-.report-body { font-size: 14px; line-height: 1.75; color: #374151; }
-.report-body h3 { font-size: 15px; font-weight: 700; color: var(--black); margin: 18px 0 8px; }
-.report-body p { margin-bottom: 10px; }
-.report-body ul, .report-body ol { padding-left: 20px; margin-bottom: 12px; }
-.report-body li { margin-bottom: 6px; }
-.report-body strong { color: var(--black); font-weight: 600; }
-.report-body code {
-  background: var(--light-grey);
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-family: monospace;
-  font-size: 12px;
-  color: var(--accent);
-}
-.report-body pre {
-  background: #1e293b;
-  color: #e2e8f0;
+.sec-card-left { display: flex; align-items: center; gap: 12px; }
+.sec-card-icon {
+  width: 34px; height: 34px;
   border-radius: 10px;
-  padding: 20px;
-  overflow-x: auto;
-  margin: 14px 0;
-  font-size: 12px;
-  line-height: 1.6;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.sec-card-num { font-size: 10px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; }
+.sec-card-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+.sec-card-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.sec-badge {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+.badge-critical { background: #fef2f2; color: #991b1b; }
+.badge-warn { background: #fffbeb; color: #92400e; }
+.badge-good { background: #f0fdf4; color: #166534; }
+.badge-info { background: #eff6ff; color: #1e40af; }
+.badge-purple { background: #faf5ff; color: #6b21a8; }
+.sec-chevron { font-size: 11px; color: #94a3b8; transition: transform 0.2s; user-select: none; }
+.sec-chevron.open { transform: rotate(180deg); }
+/* ── Section body ── */
+.sec-card-body {
+  display: none;
+  padding: 0 20px 20px;
+  border-top: 1px solid #f1f5f9;
+}
+.sec-card-body.open { display: block; }
+.sec-card-body p { font-size: 14px; line-height: 1.75; color: #374151; margin: 14px 0 10px; }
+.sec-card-body h3 { font-size: 14px; font-weight: 700; color: #0f172a; margin: 16px 0 6px; }
+.sec-card-body ul, .sec-card-body ol { list-style: none; padding: 0; margin: 10px 0; }
+.sec-card-body li {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 13px; color: #374151; line-height: 1.6;
+  padding: 5px 0; border-bottom: 1px solid #f8fafc;
+}
+.sec-card-body li:last-child { border-bottom: none; }
+.sec-card-body li::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%; background: #0d9488;
+  flex-shrink: 0; margin-top: 6px;
+}
+.sec-card-body strong { color: #0f172a; font-weight: 700; }
+.sec-card-body code {
+  background: #f1f5f9; border-radius: 4px;
+  padding: 1px 6px; font-family: monospace;
+  font-size: 12px; color: #0d9488;
+}
+.sec-card-body pre {
+  background: #1e293b; color: #e2e8f0;
+  border-radius: 10px; padding: 18px;
+  overflow-x: auto; margin: 14px 0;
+  font-size: 12px; line-height: 1.6;
+}
+/* ── 90-day plan grid ── */
+.plan-week-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px; margin-top: 14px;
+}
+.plan-week-card {
+  background: #f8fafc; border-radius: 10px;
+  padding: 12px; border: 1px solid #e2e8f0;
+}
+.plan-week-label {
+  font-size: 11px; font-weight: 700;
+  color: #0d9488; text-transform: uppercase;
+  letter-spacing: 0.4px; margin-bottom: 8px;
+}
+.plan-week-item {
+  font-size: 12px; color: #374151;
+  padding: 4px 0; border-bottom: 1px solid #e2e8f0;
+  line-height: 1.5;
+}
+.plan-week-item:last-child { border-bottom: none; }
+@media (max-width: 640px) {
+  .rpt-health-row { grid-template-columns: 1fr 1fr; }
+  .plan-week-grid { grid-template-columns: 1fr 1fr; }
+  .sec-badge { display: none; }
 }
 
 .locked-sections {
@@ -1173,6 +1254,8 @@ async function generateFullReport(returnUrl, returnContext, sessionId, verifyDat
           if (data.text) {
             fullReport += data.text;
             document.getElementById('stream-content').innerHTML = renderMarkdown(fullReport);
+            injectHealthSummary(fullReport, returnUrl);
+            injectHealthSummary(fullReport, returnUrl);
           }
           if (data.error) throw new Error(data.error);
         } catch(e) {}
@@ -1181,29 +1264,105 @@ async function generateFullReport(returnUrl, returnContext, sessionId, verifyDat
   }
 }
 
+function injectHealthSummary(md, url) {
+  const mobileMatch = md.match(/mobile[^\n]*?(\d{1,3})\s*\/\s*100/i);
+  const desktopMatch = md.match(/desktop[^\n]*?(\d{1,3})\s*\/\s*100/i);
+  const daMatch = md.match(/pagerank score[^\n]*(\d{1,2})\s*\/\s*10/i) || md.match(/score\s+(\d{1,2})\s*\/\s*10/i);
+  const noBroken = !md.match(/broken links found[^\n]*(?!none)/i) || !!md.match(/broken[^\n]*none/i);
+  const httpsNo = md.match(/https[^\n]*(not|no\s|missing)/i);
+
+  const mobile = mobileMatch ? parseInt(mobileMatch[1]) : null;
+  const desktop = desktopMatch ? parseInt(desktopMatch[1]) : null;
+  const da = daMatch ? parseInt(daMatch[1]) : null;
+
+  function sc(s) { return s===null?'#94a3b8':s>=80?'#0d9488':s>=50?'#d97706':'#dc2626'; }
+  function sl(s) { return s===null?'—':s>=80?'Good':s>=50?'Needs work':'Poor'; }
+
+  const cards = [
+    mobile!==null?`<div class="rpt-health-card"><div class="rpt-health-label">Mobile speed</div><div class="rpt-health-score" style="color:${sc(mobile)}">${mobile}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${mobile}%;background:${sc(mobile)}"></div></div><div class="rpt-health-sub" style="color:${sc(mobile)}">${sl(mobile)}</div></div>`:'',
+    desktop!==null?`<div class="rpt-health-card"><div class="rpt-health-label">Desktop speed</div><div class="rpt-health-score" style="color:${sc(desktop)}">${desktop}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${desktop}%;background:${sc(desktop)}"></div></div><div class="rpt-health-sub" style="color:${sc(desktop)}">${sl(desktop)}</div></div>`:'',
+    da!==null?`<div class="rpt-health-card"><div class="rpt-health-label">Domain authority</div><div class="rpt-health-score" style="color:${da>=6?'#0d9488':da>=3?'#d97706':'#dc2626'}">${da}<span style="font-size:14px;font-weight:400">/10</span></div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${da*10}%;background:${da>=6?'#0d9488':da>=3?'#d97706':'#dc2626'}"></div></div><div class="rpt-health-sub" style="color:${da>=6?'#0d9488':da>=3?'#d97706':'#dc2626'}">${da>=6?'Strong':da>=3?'Building':'Low'}</div></div>`:'',
+    `<div class="rpt-health-card"><div class="rpt-health-label">Internal links</div><div class="rpt-health-score" style="color:${noBroken?'#0d9488':'#dc2626'}">${noBroken?'✓':'!'}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${noBroken?100:30}%;background:${noBroken?'#0d9488':'#dc2626'}"></div></div><div class="rpt-health-sub" style="color:${noBroken?'#0d9488':'#dc2626'}">${noBroken?'All working':'Issues found'}</div></div>`,
+    `<div class="rpt-health-card"><div class="rpt-health-label">HTTPS</div><div class="rpt-health-score" style="color:${httpsNo?'#dc2626':'#0d9488'}">${httpsNo?'✗':'✓'}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:100%;background:${httpsNo?'#dc2626':'#0d9488'}"></div></div><div class="rpt-health-sub" style="color:${httpsNo?'#dc2626':'#0d9488'}">${httpsNo?'Not set up':'Secure'}</div></div>`
+  ].filter(Boolean);
+
+  const el = document.getElementById('full-report-content');
+  if (el && cards.length) el.insertAdjacentHTML('afterbegin', `<div class="rpt-health-row">${cards.join('')}</div>`);
+}
+
+const SEC_META = {
+  'SEO Snapshot':{ icon:'◎', color:'#0d9488', bg:'#f0fdfa' },
+  'Keyword Strategy':{ icon:'⌖', color:'#2563eb', bg:'#eff6ff' },
+  'On-Page SEO':{ icon:'✎', color:'#dc2626', bg:'#fef2f2' },
+  'Technical SEO':{ icon:'⚡', color:'#d97706', bg:'#fffbeb' },
+  'Content Strategy':{ icon:'✦', color:'#7c3aed', bg:'#faf5ff' },
+  'Local SEO & Google Business Profile':{ icon:'◉', color:'#db2777', bg:'#fdf2f8' },
+  'AI Search Visibility':{ icon:'✧', color:'#0891b2', bg:'#ecfeff' },
+  'Competitor Analysis':{ icon:'⊞', color:'#65a30d', bg:'#f7fee7' },
+  'Schema Markup':{ icon:'{}', color:'#ea580c', bg:'#fff7ed' },
+  'Backlink Building':{ icon:'⇄', color:'#6366f1', bg:'#eef2ff' },
+  'Google Search Console':{ icon:'◈', color:'#0284c7', bg:'#f0f9ff' },
+  '90-Day Action Plan':{ icon:'▦', color:'#059669', bg:'#f0fdf4' },
+};
+
+function getBadge(title, body) {
+  const t = title.toLowerCase(), b = (body||'').toLowerCase();
+  if (b.includes('not set up')||b.includes('not installed')) return {text:'Action needed',cls:'badge-critical'};
+  if (b.includes('critical')||b.includes('missing')) return {text:'Critical',cls:'badge-critical'};
+  if (b.includes('opportunity')||b.includes('quick win')) return {text:'Quick win',cls:'badge-info'};
+  if (t.includes('90-day')||t.includes('action plan')) return {text:'Your roadmap',cls:'badge-good'};
+  if (t.includes('keyword')||t.includes('content')||t.includes('backlink')) return {text:'Opportunity',cls:'badge-purple'};
+  return {text:'Review',cls:'badge-warn'};
+}
+
+function renderPlanSection(lines) {
+  const weeks = [];
+  let cur = null;
+  for (const line of lines) {
+    if (/week\s+[\d\-–]+/i.test(line)||/^###\s*week/i.test(line)) {
+      if (cur) weeks.push(cur);
+      cur = { label: line.replace(/^[-*#\d.\s]+/,'').replace(/:$/,'').trim(), items: [] };
+    } else if (cur && (line.startsWith('- ')||line.startsWith('* ')||/^\d+\.\s/.test(line))) {
+      cur.items.push(line.replace(/^[-*\d.]+\s+/,'').trim());
+    } else if (cur && line.trim() && !line.startsWith('#')) {
+      if (line.trim().length > 3) cur.items.push(line.trim());
+    }
+  }
+  if (cur) weeks.push(cur);
+  if (!weeks.length) return renderLines(lines);
+  return '<div class="plan-week-grid">'+weeks.map(w=>`<div class="plan-week-card"><div class="plan-week-label">${w.label}</div>${w.items.map(i=>`<div class="plan-week-item">${i}</div>`).join('')}</div>`).join('')+'</div>';
+}
+
 function renderMarkdown(md) {
   if (!md) return '';
   const sections = [];
   let current = null;
-
   for (const line of md.split('\n')) {
     if (line.startsWith('## ')) {
       if (current) sections.push(current);
-      current = { title: line.replace(/^##\s+/, ''), lines: [] };
+      current = { title: line.replace(/^##\s+/, '').trim(), lines: [] };
     } else if (current) {
       current.lines.push(line);
     }
   }
   if (current) sections.push(current);
+  if (!sections.length) return `<div class="report-section"><div class="sec-card-body open">${simpleMarkdown(md)}</div></div>`;
+  return sections.map((sec, idx) => {
+    const meta = SEC_META[sec.title] || { icon:'◆', color:'#0d9488', bg:'#f0fdfa' };
+    const firstPara = sec.lines.find(l => l.trim() && !l.startsWith('-') && !l.startsWith('*') && !l.startsWith('#') && !/^\d+\./.test(l)) || '';
+    const badge = getBadge(sec.title, firstPara);
+    const isPlan = sec.title.toLowerCase().includes('90-day') || sec.title.toLowerCase().includes('action plan');
+    const bodyHtml = isPlan ? renderPlanSection(sec.lines) : renderLines(sec.lines);
+    const isFirst = idx === 0;
+    return `<div class="report-section"><div class="sec-card-head" onclick="toggleSection(this)"><div class="sec-card-left"><div class="sec-card-icon" style="background:${meta.bg};color:${meta.color}">${meta.icon}</div><div><div class="sec-card-num">${String(idx+1).padStart(2,'0')}</div><div class="sec-card-title">${sec.title}</div></div></div><div class="sec-card-right"><span class="sec-badge ${badge.cls}">${badge.text}</span><span class="sec-chevron${isFirst?' open':''}">▼</span></div></div><div class="sec-card-body${isFirst?' open':''}">${bodyHtml}</div></div>`;
+  }).join('');
+}
 
-  if (!sections.length) return `<div class="report-section"><div class="report-body">${simpleMarkdown(md)}</div></div>`;
-
-  return sections.map(sec => `
-    <div class="report-section">
-      <div class="section-title">${sec.title}</div>
-      <div class="report-body">${renderLines(sec.lines)}</div>
-    </div>
-  `).join('');
+function toggleSection(head) {
+  const body = head.nextElementSibling;
+  const chev = head.querySelector('.sec-chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
 }
 
 function renderLines(lines) {
@@ -1443,6 +1602,9 @@ window.addEventListener('load', async () => {
                 if (data.text) {
                   fullReport += data.text;
                   document.getElementById('stream-content').innerHTML = renderMarkdown(fullReport);
+            injectHealthSummary(fullReport, returnUrl);
+                  injectHealthSummary(fullReport, returnUrl || currentUrl);
+            injectHealthSummary(fullReport, returnUrl);
                 }
                 if (data.error) throw new Error(data.error);
               } catch(e) {}
