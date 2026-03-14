@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex, nofollow" />
   <title>GetAProSEO — Admin Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #f5f5f5; min-height: 100vh; padding: 24px; }
 
-    .card { background: white; border-radius: 16px; padding: 40px; max-width: 680px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
-
-    .logo { font-family: Georgia, serif; font-size: 22px; font-weight: 900; color: #0a0a0a; margin-bottom: 8px; }
+    .card { background: white; border-radius: 16px; padding: 40px; max-width: 860px; width: 100%; margin: 0 auto; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; color: #0a0a0a; margin-bottom: 8px; }
     .logo span { color: #0d9488; }
     .badge { display: inline-block; background: #fef3c7; color: #92400e; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 28px; letter-spacing: 0.05em; text-transform: uppercase; }
 
@@ -22,39 +22,78 @@
     input, textarea { width: 100%; border: 1.5px solid #e5e7eb; border-radius: 10px; padding: 12px 14px; font-size: 15px; color: #0a0a0a; outline: none; transition: border-color 0.2s; font-family: inherit; }
     input:focus, textarea:focus { border-color: #0d9488; }
     textarea { resize: vertical; min-height: 80px; }
-
     .field { margin-bottom: 20px; }
 
-    .btn { width: 100%; background: #0d9488; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+    .btn { width: 100%; background: #0d9488; color: white; border: none; border-radius: 10px; padding: 14px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-family: inherit; }
     .btn:hover { background: #0b7c72; }
     .btn:disabled { background: #99d6d1; cursor: not-allowed; }
 
     .error { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
+    .status { font-size: 13px; color: #0d9488; font-weight: 600; margin-bottom: 12px; display: none; }
+    .reset-btn { background: none; border: none; color: #0d9488; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; margin-top: 24px; text-decoration: underline; font-family: inherit; }
 
     .report-box { margin-top: 32px; display: none; }
-    .report-box h2 { font-size: 16px; color: #444; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
-    .report-content { font-size: 15px; line-height: 1.8; color: #1a1a1a; white-space: pre-wrap; }
-    .report-content h2 { font-size: 18px; font-weight: 800; color: #0a0a0a; margin: 28px 0 10px; padding-bottom: 0; border-bottom: none; }
-    .report-content h3 { font-size: 15px; font-weight: 700; color: #0d9488; margin: 18px 0 6px; }
-    .report-content strong { color: #0a0a0a; }
-    .report-content ul { padding-left: 20px; margin: 8px 0; }
-    .report-content li { margin-bottom: 6px; }
+    .report-box-title { font-size: 16px; color: #444; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
 
-    .status { font-size: 13px; color: #0d9488; font-weight: 600; margin-bottom: 12px; display: none; }
+    /* ── Health row ── */
+    .rpt-health-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+    .rpt-health-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 12px; text-align: center; }
+    .rpt-health-label { font-size: 11px; color: #64748b; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+    .rpt-health-score { font-size: 28px; font-weight: 800; line-height: 1; }
+    .rpt-health-sub { font-size: 11px; margin-top: 4px; font-weight: 600; }
+    .rpt-gauge { height: 4px; background: #e2e8f0; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+    .rpt-gauge-fill { height: 100%; border-radius: 2px; }
 
-    .reset-btn { background: none; border: none; color: #0d9488; font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; margin-top: 24px; text-decoration: underline; }
+    /* ── Section cards ── */
+    .report-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.15s; }
+    .report-section:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .sec-card-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; gap: 12px; }
+    .sec-card-left { display: flex; align-items: center; gap: 12px; }
+    .sec-card-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .sec-card-num { font-size: 10px; color: #94a3b8; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .sec-card-title { font-size: 15px; font-weight: 700; color: #0f172a; }
+    .sec-card-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .sec-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; }
+    .badge-critical { background: #fef2f2; color: #991b1b; }
+    .badge-warn { background: #fffbeb; color: #92400e; }
+    .badge-good { background: #f0fdf4; color: #166534; }
+    .badge-info { background: #eff6ff; color: #1e40af; }
+    .badge-purple { background: #faf5ff; color: #6b21a8; }
+    .sec-chevron { font-size: 11px; color: #94a3b8; transition: transform 0.2s; user-select: none; }
+    .sec-chevron.open { transform: rotate(180deg); }
 
-    .scores { display: flex; gap: 12px; flex-wrap: wrap; margin: 16px 0; }
-    .score-pill { background: #f0fdf9; border: 1.5px solid #0d9488; border-radius: 8px; padding: 8px 14px; font-size: 13px; font-weight: 600; color: #0d9488; }
+    /* ── Section body ── */
+    .sec-card-body { display: none; padding: 0 20px 20px; border-top: 1px solid #f1f5f9; }
+    .sec-card-body.open { display: block; }
+    .sec-card-body p { font-size: 14px; line-height: 1.75; color: #374151; margin: 14px 0 10px; }
+    .sec-card-body h3 { font-size: 14px; font-weight: 700; color: #0f172a; margin: 16px 0 6px; }
+    .sec-card-body ul, .sec-card-body ol { list-style: none; padding: 0; margin: 10px 0; }
+    .sec-card-body li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #374151; line-height: 1.6; padding: 5px 0; border-bottom: 1px solid #f8fafc; }
+    .sec-card-body li:last-child { border-bottom: none; }
+    .sec-card-body li::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #0d9488; flex-shrink: 0; margin-top: 6px; }
+    .sec-card-body strong { color: #0f172a; font-weight: 700; }
+    .sec-card-body code { background: #f1f5f9; border-radius: 4px; padding: 1px 6px; font-family: monospace; font-size: 12px; color: #0d9488; }
+    .sec-card-body pre { background: #1e293b; color: #e2e8f0; border-radius: 10px; padding: 18px; overflow-x: auto; margin: 14px 0; font-size: 12px; line-height: 1.6; }
+
+    /* ── Plan grid ── */
+    .plan-week-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
+    .plan-week-card { background: #f8fafc; border-radius: 10px; padding: 12px; border: 1px solid #e2e8f0; }
+    .plan-week-label { font-size: 11px; font-weight: 700; color: #0d9488; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 8px; }
+    .plan-week-item { font-size: 12px; color: #374151; padding: 4px 0; border-bottom: 1px solid #e2e8f0; line-height: 1.5; }
+    .plan-week-item:last-child { border-bottom: none; }
+
+    @media (max-width: 640px) {
+      .rpt-health-row { grid-template-columns: 1fr 1fr; }
+      .plan-week-grid { grid-template-columns: 1fr 1fr; }
+      .sec-badge { display: none; }
+    }
   </style>
 </head>
 <body>
-
 <div class="card">
   <div class="logo">GetAPro<span>SEO</span></div>
   <div class="badge">Admin Test Mode</div>
 
-  <!-- Login -->
   <div class="login-section" id="loginSection">
     <div class="field">
       <label for="password">Admin Password</label>
@@ -64,7 +103,6 @@
     <button class="btn" onclick="checkPassword()">Enter</button>
   </div>
 
-  <!-- Main test interface -->
   <div class="main-section" id="mainSection">
     <div class="field">
       <label for="testUrl">Website URL to test</label>
@@ -72,135 +110,216 @@
     </div>
     <div class="field">
       <label for="testContext">Business context (optional)</label>
-      <textarea id="testContext" placeholder="e.g. A recruitment agency targeting UK-based tech companies"></textarea>
+      <textarea id="testContext" placeholder="e.g. A pub in Chapeltown, Sheffield"></textarea>
     </div>
     <button class="btn" id="generateBtn" onclick="generateReport()">Generate Full Report</button>
 
     <div class="report-box" id="reportBox">
       <div class="status" id="status">⏳ Generating report...</div>
-      <h2 id="reportTitle"></h2>
-      <div class="report-content" id="reportContent"></div>
+      <div class="report-box-title" id="reportTitle"></div>
+      <div id="healthSummary"></div>
+      <div id="reportContent"></div>
       <button class="reset-btn" onclick="resetForm()">Run another test</button>
     </div>
   </div>
 </div>
 
 <script>
-  // Simple client-side password check
-  const ADMIN_PASSWORD = 'marley';
+const ADMIN_PASSWORD = 'marley';
 
-  function checkPassword() {
-    const val = document.getElementById('password').value;
-    if (val === ADMIN_PASSWORD) {
-      document.getElementById('loginSection').style.display = 'none';
-      document.getElementById('mainSection').style.display = 'block';
-    } else {
-      document.getElementById('pwError').style.display = 'block';
+function checkPassword() {
+  if (document.getElementById('password').value === ADMIN_PASSWORD) {
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('mainSection').style.display = 'block';
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+  }
+}
+document.getElementById('password')?.addEventListener('keydown', e => { if (e.key === 'Enter') checkPassword(); });
+
+const SEC_META = {
+  'SEO Snapshot':{ icon:'◎', color:'#0d9488', bg:'#f0fdfa' },
+  'Keyword Strategy':{ icon:'⌖', color:'#2563eb', bg:'#eff6ff' },
+  'On-Page SEO':{ icon:'✎', color:'#dc2626', bg:'#fef2f2' },
+  'Technical SEO':{ icon:'⚡', color:'#d97706', bg:'#fffbeb' },
+  'Content Strategy':{ icon:'✦', color:'#7c3aed', bg:'#faf5ff' },
+  'Local SEO & Google Business Profile':{ icon:'◉', color:'#db2777', bg:'#fdf2f8' },
+  'AI Search Visibility':{ icon:'✧', color:'#0891b2', bg:'#ecfeff' },
+  'Competitor Analysis':{ icon:'⊞', color:'#65a30d', bg:'#f7fee7' },
+  'Schema Markup':{ icon:'{}', color:'#ea580c', bg:'#fff7ed' },
+  'Backlink Building':{ icon:'⇄', color:'#6366f1', bg:'#eef2ff' },
+  'Google Search Console':{ icon:'◈', color:'#0284c7', bg:'#f0f9ff' },
+  '90-Day Action Plan':{ icon:'▦', color:'#059669', bg:'#f0fdf4' },
+};
+
+function getBadge(title, body) {
+  const t = title.toLowerCase(), b = (body||'').toLowerCase();
+  if (b.includes('not set up')||b.includes('not installed')) return {text:'Action needed',cls:'badge-critical'};
+  if (b.includes('critical')||b.includes('missing')) return {text:'Critical',cls:'badge-critical'};
+  if (b.includes('opportunity')||b.includes('quick win')) return {text:'Quick win',cls:'badge-info'};
+  if (t.includes('90-day')||t.includes('action plan')) return {text:'Your roadmap',cls:'badge-good'};
+  if (t.includes('keyword')||t.includes('content')||t.includes('backlink')) return {text:'Opportunity',cls:'badge-purple'};
+  return {text:'Review',cls:'badge-warn'};
+}
+
+function toggleSection(head) {
+  head.nextElementSibling.classList.toggle('open');
+  head.querySelector('.sec-chevron').classList.toggle('open');
+}
+
+function inlineMarkdown(text) {
+  return text.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\*(.+?)\*/g,'<em>$1</em>');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderLines(lines) {
+  let html='', inCode=false, codeLines=[], listItems=[];
+  const flushList = () => {
+    if (listItems.length) { html += '<ul>'+listItems.map(li=>`<li>${inlineMarkdown(li)}</li>`).join('')+'</ul>'; listItems=[]; }
+  };
+  for (const line of lines) {
+    if (line.startsWith('```')) { flushList(); if (!inCode){inCode=true;codeLines=[];}else{inCode=false;html+=`<pre><code>${escHtml(codeLines.join('\n'))}</code></pre>`;} continue; }
+    if (inCode) { codeLines.push(line); continue; }
+    if (line.startsWith('### ')) { flushList(); html+=`<h3>${line.replace(/^###\s+/,'')}</h3>`; continue; }
+    if (line.startsWith('- ')||line.startsWith('* ')) { listItems.push(line.replace(/^[-*]\s+/,'')); continue; }
+    if (/^\d+\.\s/.test(line)) { listItems.push(line.replace(/^\d+\.\s+/,'')); continue; }
+    flushList();
+    if (line.trim()) html+=`<p>${inlineMarkdown(line)}</p>`;
+  }
+  flushList();
+  return html;
+}
+
+function renderPlanSection(lines) {
+  const weeks=[]; let cur=null;
+  for (const line of lines) {
+    if (/week\s+[\d\-–]+/i.test(line)||/^###\s*week/i.test(line)) {
+      if (cur) weeks.push(cur);
+      cur={label:line.replace(/^[-*#\d.\s]+/,'').replace(/:$/,'').trim(),items:[]};
+    } else if (cur&&(line.startsWith('- ')||line.startsWith('* ')||/^\d+\.\s/.test(line))) {
+      cur.items.push(line.replace(/^[-*\d.]+\s+/,'').trim());
+    } else if (cur&&line.trim()&&!line.startsWith('#')&&line.trim().length>3) {
+      cur.items.push(line.trim());
     }
   }
+  if (cur) weeks.push(cur);
+  if (!weeks.length) return renderLines(lines);
+  return '<div class="plan-week-grid">'+weeks.map(w=>`<div class="plan-week-card"><div class="plan-week-label">${w.label}</div>${w.items.map(i=>`<div class="plan-week-item">${i}</div>`).join('')}</div>`).join('')+'</div>';
+}
 
-  document.getElementById('password')?.addEventListener('keydown', e => {
-    if (e.key === 'Enter') checkPassword();
-  });
+function renderMarkdown(md) {
+  if (!md) return '';
+  const sections=[]; let current=null;
+  for (const line of md.split('\n')) {
+    if (line.startsWith('## ')) { if (current) sections.push(current); current={title:line.replace(/^##\s+/,'').trim(),lines:[]}; }
+    else if (current) current.lines.push(line);
+  }
+  if (current) sections.push(current);
+  if (!sections.length) return `<div class="report-section"><div class="sec-card-body open">${renderLines(md.split('\n'))}</div></div>`;
+  return sections.map((sec,idx)=>{
+    const meta=SEC_META[sec.title]||{icon:'◆',color:'#0d9488',bg:'#f0fdfa'};
+    const firstPara=sec.lines.find(l=>l.trim()&&!l.startsWith('-')&&!l.startsWith('*')&&!l.startsWith('#')&&!/^\d+\./.test(l))||'';
+    const badge=getBadge(sec.title,firstPara);
+    const isPlan=sec.title.toLowerCase().includes('90-day')||sec.title.toLowerCase().includes('action plan');
+    const bodyHtml=isPlan?renderPlanSection(sec.lines):renderLines(sec.lines);
+    const isFirst=idx===0;
+    return `<div class="report-section"><div class="sec-card-head" onclick="toggleSection(this)"><div class="sec-card-left"><div class="sec-card-icon" style="background:${meta.bg};color:${meta.color}">${meta.icon}</div><div><div class="sec-card-num">${String(idx+1).padStart(2,'0')}</div><div class="sec-card-title">${sec.title}</div></div></div><div class="sec-card-right"><span class="sec-badge ${badge.cls}">${badge.text}</span><span class="sec-chevron${isFirst?' open':''}">▼</span></div></div><div class="sec-card-body${isFirst?' open':''}">${bodyHtml}</div></div>`;
+  }).join('');
+}
 
-  async function generateReport() {
-    const url = document.getElementById('testUrl').value.trim();
-    const context = document.getElementById('testContext').value.trim();
+function injectHealthSummary(md) {
+  const mobileMatch=md.match(/mobile[^\n]*?(\d{1,3})\s*\/\s*100/i);
+  const desktopMatch=md.match(/desktop[^\n]*?(\d{1,3})\s*\/\s*100/i);
+  const daMatch=md.match(/pagerank score[^\n]*(\d{1,2})\s*\/\s*10/i)||md.match(/score\s+(\d{1,2})\s*\/\s*10/i);
+  const noBroken=!md.match(/broken links found[^\n]*(?!none)/i)||!!md.match(/broken[^\n]*none/i);
+  const httpsNo=md.match(/https[^\n]*(not|no\s|missing)/i);
+  const mobile=mobileMatch?parseInt(mobileMatch[1]):null;
+  const desktop=desktopMatch?parseInt(desktopMatch[1]):null;
+  const da=daMatch?parseInt(daMatch[1]):null;
+  function sc(s){return s===null?'#94a3b8':s>=80?'#0d9488':s>=50?'#d97706':'#dc2626';}
+  function sl(s){return s===null?'—':s>=80?'Good':s>=50?'Needs work':'Poor';}
+  const cards=[
+    mobile!==null?`<div class="rpt-health-card"><div class="rpt-health-label">Mobile speed</div><div class="rpt-health-score" style="color:${sc(mobile)}">${mobile}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${mobile}%;background:${sc(mobile)}"></div></div><div class="rpt-health-sub" style="color:${sc(mobile)}">${sl(mobile)}</div></div>`:'',
+    desktop!==null?`<div class="rpt-health-card"><div class="rpt-health-label">Desktop speed</div><div class="rpt-health-score" style="color:${sc(desktop)}">${desktop}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${desktop}%;background:${sc(desktop)}"></div></div><div class="rpt-health-sub" style="color:${sc(desktop)}">${sl(desktop)}</div></div>`:'',
+    da!==null?`<div class="rpt-health-card"><div class="rpt-health-label">Domain authority</div><div class="rpt-health-score" style="color:${da>=6?'#0d9488':da>=3?'#d97706':'#dc2626'}">${da}<span style="font-size:14px;font-weight:400">/10</span></div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${da*10}%;background:${da>=6?'#0d9488':da>=3?'#d97706':'#dc2626'}"></div></div><div class="rpt-health-sub" style="color:${da>=6?'#0d9488':da>=3?'#d97706':'#dc2626'}">${da>=6?'Strong':da>=3?'Building':'Low'}</div></div>`:'',
+    `<div class="rpt-health-card"><div class="rpt-health-label">Internal links</div><div class="rpt-health-score" style="color:${noBroken?'#0d9488':'#dc2626'}">${noBroken?'✓':'!'}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:${noBroken?100:30}%;background:${noBroken?'#0d9488':'#dc2626'}"></div></div><div class="rpt-health-sub" style="color:${noBroken?'#0d9488':'#dc2626'}">${noBroken?'All working':'Issues found'}</div></div>`,
+    `<div class="rpt-health-card"><div class="rpt-health-label">HTTPS</div><div class="rpt-health-score" style="color:${httpsNo?'#dc2626':'#0d9488'}">${httpsNo?'✗':'✓'}</div><div class="rpt-gauge"><div class="rpt-gauge-fill" style="width:100%;background:${httpsNo?'#dc2626':'#0d9488'}"></div></div><div class="rpt-health-sub" style="color:${httpsNo?'#dc2626':'#0d9488'}">${httpsNo?'Not set up':'Secure'}</div></div>`
+  ].filter(Boolean);
+  const el=document.getElementById('healthSummary');
+  if (el&&cards.length) el.innerHTML=`<div class="rpt-health-row">${cards.join('')}</div>`;
+}
 
-    if (!url) {
-      alert('Please enter a URL to test.');
-      return;
-    }
+async function generateReport() {
+  const url = document.getElementById('testUrl').value.trim();
+  const context = document.getElementById('testContext').value.trim();
+  if (!url) { alert('Please enter a URL to test.'); return; }
 
-    const btn = document.getElementById('generateBtn');
-    const reportBox = document.getElementById('reportBox');
-    const reportContent = document.getElementById('reportContent');
-    const reportTitle = document.getElementById('reportTitle');
-    const status = document.getElementById('status');
+  const btn = document.getElementById('generateBtn');
+  const reportBox = document.getElementById('reportBox');
+  const reportContent = document.getElementById('reportContent');
+  const status = document.getElementById('status');
 
-    btn.disabled = true;
-    btn.textContent = 'Generating...';
-    reportBox.style.display = 'block';
-    status.style.display = 'block';
-    reportContent.textContent = '';
-    reportTitle.textContent = `Report for ${url}`;
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  reportBox.style.display = 'block';
+  status.style.display = 'block';
+  status.textContent = '⏳ Generating report...';
+  reportContent.innerHTML = '';
+  document.getElementById('healthSummary').innerHTML = '';
+  document.getElementById('reportTitle').textContent = `Report for ${url}`;
 
-    try {
-      const response = await fetch('/api/report', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url,
-          context,
-          type: 'full',
-          admin: true,
-          session_id: 'admin-test-' + Date.now()
-        })
-      });
+  try {
+    const response = await fetch('/api/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, context, type: 'full', admin: true, admin_password: 'marley', session_id: 'admin-test-' + Date.now() })
+    });
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
-      let fullText = '';
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '', fullText = '';
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop();
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            try {
-              const json = JSON.parse(line.slice(6));
-              if (json.text) {
-                fullText += json.text;
-                reportContent.innerHTML = formatReport(fullText);
-              }
-              if (json.done) {
-                status.style.display = 'none';
-                btn.disabled = false;
-                btn.textContent = 'Generate Full Report';
-              }
-              if (json.error) {
-                status.textContent = '❌ Error: ' + json.error;
-                btn.disabled = false;
-                btn.textContent = 'Generate Full Report';
-              }
-            } catch (e) {}
-          }
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const json = JSON.parse(line.slice(6));
+            if (json.text) {
+              fullText += json.text;
+              reportContent.innerHTML = renderMarkdown(fullText);
+              injectHealthSummary(fullText);
+            }
+            if (json.done) { status.style.display = 'none'; btn.disabled = false; btn.textContent = 'Generate Full Report'; }
+            if (json.error) { status.textContent = '❌ Error: ' + json.error; btn.disabled = false; btn.textContent = 'Generate Full Report'; }
+          } catch(e) {}
         }
       }
-    } catch (err) {
-      status.textContent = '❌ Something went wrong. Check the console.';
-      console.error(err);
-      btn.disabled = false;
-      btn.textContent = 'Generate Full Report';
     }
+  } catch(err) {
+    status.textContent = '❌ Something went wrong. Check the console.';
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Generate Full Report';
   }
+}
 
-  function formatReport(text) {
-    return text
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/^- (.+)$/gm, '<li>$1</li>')
-      .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
-      .replace(/\n{2,}/g, '<br><br>')
-      .replace(/\n/g, ' ');
-  }
-
-  function resetForm() {
-    document.getElementById('testUrl').value = '';
-    document.getElementById('testContext').value = '';
-    document.getElementById('reportBox').style.display = 'none';
-    document.getElementById('reportContent').textContent = '';
-    document.getElementById('generateBtn').disabled = false;
-    document.getElementById('generateBtn').textContent = 'Generate Full Report';
-  }
+function resetForm() {
+  document.getElementById('testUrl').value = '';
+  document.getElementById('testContext').value = '';
+  document.getElementById('reportBox').style.display = 'none';
+  document.getElementById('reportContent').innerHTML = '';
+  document.getElementById('healthSummary').innerHTML = '';
+  document.getElementById('generateBtn').disabled = false;
+  document.getElementById('generateBtn').textContent = 'Generate Full Report';
+}
 </script>
-
 </body>
 </html>
