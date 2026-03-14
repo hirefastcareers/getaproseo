@@ -1267,7 +1267,7 @@ async function generateFullReport(returnUrl, returnContext, sessionId, verifyDat
 function injectHealthSummary(md, url) {
   const mobileMatch = md.match(/mobile[^\n]*?(\d{1,3})\s*\/\s*100/i);
   const desktopMatch = md.match(/desktop[^\n]*?(\d{1,3})\s*\/\s*100/i);
-  const daMatch = md.match(/pagerank score[^\n]*(\d{1,2})\s*\/\s*10/i) || md.match(/score\s+(\d{1,2})\s*\/\s*10/i);
+  const daMatch = md.match(/pagerank[\s\S]{0,60}?(\d{1,2})\s*\/\s*10/i) || md.match(/domain authority[^\n]*(\d{1,2})\s*\/\s*10/i) || md.match(/(\d{1,2})\s*\/\s*10[^\n]*authority/i);
   const noBroken = !md.match(/broken links found[^\n]*(?!none)/i) || !!md.match(/broken[^\n]*none/i);
   const httpsNo = md.match(/https[^\n]*(not|no\s|missing)/i);
 
@@ -1305,8 +1305,24 @@ const SEC_META = {
   '90-Day Action Plan':{ icon:'▦', color:'#059669', bg:'#f0fdf4' },
 };
 
-function getBadge(title, body) {
+function getBadge(title, body, allLines) {
   const t = title.toLowerCase(), b = (body||'').toLowerCase();
+  const lines = (allLines || []).join(' ').toLowerCase();
+  if (t.includes('on-page')) {
+    if (/h1|meta description|title\s+(issue|missing|problem)/i.test(lines)) return {text:'Critical',cls:'badge-critical'};
+  }
+  if (t.includes('local seo') || t.includes('google business')) {
+    if (/claim|verify|not set up/i.test(lines)) return {text:'Action needed',cls:'badge-critical'};
+  }
+  if (t.includes('technical')) {
+    if (/https|ssl/i.test(lines)) return {text:'Critical',cls:'badge-critical'};
+  }
+  if (t.includes('schema')) {
+    if (b.includes('not set up')||b.includes('not installed')) return {text:'Action needed',cls:'badge-critical'};
+    if (b.includes('critical')||b.includes('missing')) return {text:'Critical',cls:'badge-critical'};
+    if (b.includes('opportunity')||b.includes('quick win')) return {text:'Quick win',cls:'badge-info'};
+    return {text:'Not installed',cls:'badge-warn'};
+  }
   if (b.includes('not set up')||b.includes('not installed')) return {text:'Action needed',cls:'badge-critical'};
   if (b.includes('critical')||b.includes('missing')) return {text:'Critical',cls:'badge-critical'};
   if (b.includes('opportunity')||b.includes('quick win')) return {text:'Quick win',cls:'badge-info'};
@@ -1350,7 +1366,7 @@ function renderMarkdown(md) {
   return sections.map((sec, idx) => {
     const meta = SEC_META[sec.title] || { icon:'◆', color:'#0d9488', bg:'#f0fdfa' };
     const firstPara = sec.lines.find(l => l.trim() && !l.startsWith('-') && !l.startsWith('*') && !l.startsWith('#') && !/^\d+\./.test(l)) || '';
-    const badge = getBadge(sec.title, firstPara);
+    const badge = getBadge(sec.title, firstPara, sec.lines);
     const isPlan = sec.title.toLowerCase().includes('90-day') || sec.title.toLowerCase().includes('action plan');
     const bodyHtml = isPlan ? renderPlanSection(sec.lines) : renderLines(sec.lines);
     const isFirst = idx === 0;
